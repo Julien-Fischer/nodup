@@ -13,11 +13,16 @@ public class ImageProcessor {
     public static Collection<Collision> detectCollisions(Image... images) {
         Set<Image> read = new HashSet<>();
         List<Collision> results = new ArrayList<>();
+        int i = 0;
         for (var image : images) {
+            System.out.println("-".repeat(40));
+            System.out.println("EXIF: " + i + "/" + images.length);
+            System.out.println("-".repeat(40));
             System.out.println(image);
             if (read.contains(image)) continue;
             for (var other : images) {
                 System.out.println("    " + other);
+                if (!image.hasSize(other)) continue;
                 if (read.contains(other) || image == other) continue;
                 var potentialCollision = detectCollision(image, other);
                 if (potentialCollision.isPresent()) {
@@ -25,6 +30,7 @@ public class ImageProcessor {
                     results.add(potentialCollision.get());
                 }
             }
+            i++;
         }
         return results;
     }
