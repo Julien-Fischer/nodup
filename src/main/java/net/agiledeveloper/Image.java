@@ -1,12 +1,14 @@
 package net.agiledeveloper;
 
+import java.io.IOException;
+
 public interface Image {
 
     int width();
 
     int height();
 
-    int[] pixels();
+    int[] pixels() throws IOException;
 
     default boolean hasSize(Image other) {
         return (

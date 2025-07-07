@@ -1,5 +1,6 @@
 package net.agiledeveloper;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -27,9 +28,6 @@ public class ImageProcessor {
     }
 
     public static Optional<Collision> detectCollision(Image imageA, Image imageB) {
-        if (!imageA.hasSize(imageB)) {
-            return Optional.empty();
-        }
         Hash a = hashPixels(imageA);
         Hash b = hashPixels(imageB);
         if (!a.equals(b)) {
@@ -39,7 +37,7 @@ public class ImageProcessor {
     }
 
     public static Hash hashPixels(Image image) {
-        int[] pixels = image.pixels();
+        var pixels = readPixels(image);
         var messageDigest = getMessageDigest();
         for (int pixel : pixels) {
             messageDigest.update((byte) (pixel >> 24));
@@ -48,6 +46,14 @@ public class ImageProcessor {
             messageDigest.update((byte) pixel);
         }
         return new Hash(messageDigest.digest());
+    }
+
+    private static int[] readPixels(Image image) {
+        try {
+            return image.pixels();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static MessageDigest getMessageDigest() {
@@ -80,6 +86,10 @@ public class ImageProcessor {
 
     public record Collision(Hash hash, Image a, Image b) {
 
+        @Override
+        public String toString() {
+            return "Collision %s vs %s".formatted(a, b);
+        }
     }
 
 }
