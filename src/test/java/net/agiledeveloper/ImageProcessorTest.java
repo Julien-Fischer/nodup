@@ -30,6 +30,16 @@ class ImageProcessorTest {
         assertThat(potentialMatch).isEmpty();
     }
 
+    @Test
+    void same_images() {
+        Image a = aCat();
+        Image b = aCat();
+
+        Optional<Collision> potentialMatch = ImageProcessor.detectCollision(a, b);
+
+        assertThat(potentialMatch).isPresent();
+    }
+
 
     private static Image aCat() {
         return new StubImage(new int[] {0, 0, 0, 0});
