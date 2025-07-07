@@ -1,7 +1,6 @@
 package net.agiledeveloper;
 
 import net.agiledeveloper.ImageProcessor.Collision;
-import net.agiledeveloper.ImageProcessor.Image;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
