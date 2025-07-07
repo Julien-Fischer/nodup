@@ -43,7 +43,7 @@ class ImageProcessorTest {
     }
 
     @Test
-    void detect_collisions() {
+    void detect_zero_collision() {
         Image[] images = {aDog(), aCat(), aBigDog()};
 
         Collection<Collision> collisions = ImageProcessor.detectCollisions(images);
@@ -51,19 +51,47 @@ class ImageProcessorTest {
         assertThat(collisions).isEmpty();
     }
 
+    @Test
+    void detect_collisions() {
+        var a = aDog();
+        var b = aDog();
+        Image[] images = {a, aBigDog(), b, aCat()};
+
+        Collection<Collision> collisions = ImageProcessor.detectCollisions(images);
+
+        expect(collisions).toBe(a, b);
+    }
+
+
+    private static CollisionAssertion expect(Collection<Collision> collisions) {
+        return new CollisionAssertion(collisions);
+    }
+
+    private record CollisionAssertion(Collection<Collision> collisions) {
+
+        public CollisionAssertion toBe(Image a, Image b) {
+            Optional<Collision> optionalCollision = collisions.stream().findFirst();
+            var collision = optionalCollision.orElseThrow();
+            assertThat(collision.a()).isEqualTo(a);
+            assertThat(collision.b()).isEqualTo(b);
+            return this;
+        }
+
+    }
+
     private static Image aCat() {
-        return new StubImage(new int[] {0, 0, 0, 0});
+        return new StubImage("aCat", new int[] {0, 0, 0, 0});
     }
 
     private static Image aDog() {
-        return new StubImage(new int[] {1, 1, 1, 1});
+        return new StubImage("aDog", new int[] {1, 1, 1, 1});
     }
 
     private static Image aBigDog() {
-        return new StubImage(new int[] {1, 1, 1, 1, 1, 1, 1, 1});
+        return new StubImage("aBigDog", new int[] {1, 1, 1, 1, 1, 1, 1, 1});
     }
 
-    private record StubImage(int[] pixels) implements Image {
+    private record StubImage(String name, int[] pixels) implements Image {
 
         @Override
         public int width() {
@@ -75,6 +103,10 @@ class ImageProcessorTest {
             return pixels.length / 2;
         }
 
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
 }

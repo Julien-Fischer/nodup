@@ -2,12 +2,7 @@ package net.agiledeveloper;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Optional;
-
-import static java.util.Collections.emptyList;
+import java.util.*;
 
 public class ImageProcessor {
 
@@ -15,7 +10,20 @@ public class ImageProcessor {
     }
 
     public static Collection<Collision> detectCollisions(Image... images) {
-        return emptyList();
+        Set<Image> read = new HashSet<>();
+        List<Collision> results = new ArrayList<>();
+        for (var image : images) {
+            if (read.contains(image)) continue;
+            for (var other : images) {
+                if (read.contains(other) || image == other) continue;
+                var potentialCollision = detectCollision(image, other);
+                if (potentialCollision.isPresent()) {
+                    read.add(other);
+                    results.add(potentialCollision.get());
+                }
+            }
+        }
+        return results;
     }
 
     public static Optional<Collision> detectCollision(Image imageA, Image imageB) {
