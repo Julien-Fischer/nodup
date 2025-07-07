@@ -14,8 +14,10 @@ public class ImageProcessor {
         Set<Image> read = new HashSet<>();
         List<Collision> results = new ArrayList<>();
         for (var image : images) {
+            System.out.println(image);
             if (read.contains(image)) continue;
             for (var other : images) {
+                System.out.println("    " + other);
                 if (read.contains(other) || image == other) continue;
                 var potentialCollision = detectCollision(image, other);
                 if (potentialCollision.isPresent()) {
