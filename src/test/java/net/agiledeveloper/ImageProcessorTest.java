@@ -4,9 +4,11 @@ import net.agiledeveloper.ImageProcessor.Collision;
 import net.agiledeveloper.ImageProcessor.Image;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collection;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class ImageProcessorTest {
 
@@ -40,6 +42,14 @@ class ImageProcessorTest {
         assertThat(potentialMatch).isPresent();
     }
 
+    @Test
+    void detect_collisions() {
+        Image[] images = {aDog(), aCat(), aBigDog()};
+
+        Collection<Collision> collisions = ImageProcessor.detectCollisions(images);
+
+        assertThat(collisions).isEmpty();
+    }
 
     private static Image aCat() {
         return new StubImage(new int[] {0, 0, 0, 0});

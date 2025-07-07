@@ -3,12 +3,19 @@ package net.agiledeveloper;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.Collections.emptyList;
 
 public class ImageProcessor {
 
     private ImageProcessor() {
+    }
+
+    public static Collection<Collision> detectCollisions(Image... images) {
+        return emptyList();
     }
 
     public static Optional<Collision> detectCollision(Image imageA, Image imageB) {
