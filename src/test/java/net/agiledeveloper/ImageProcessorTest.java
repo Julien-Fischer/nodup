@@ -1,6 +1,6 @@
 package net.agiledeveloper;
 
-import net.agiledeveloper.ImageProcessor.HashCollision;
+import net.agiledeveloper.ImageProcessor.Collision;
 import net.agiledeveloper.ImageProcessor.Image;
 import org.junit.jupiter.api.Test;
 
@@ -12,12 +12,34 @@ class ImageProcessorTest {
 
     @Test
     void different_dimensions() {
-        var bigImage = new Image(64, 64);
-        var smallImage = new Image(64, 128);
+        Image big = aBigDog();
+        Image small = aDog();
 
-        Optional<HashCollision> potentialMatch = ImageProcessor.detectCollision(bigImage, smallImage);
+        Optional<Collision> potentialMatch = ImageProcessor.detectCollision(big, small);
 
         assertThat(potentialMatch).isEmpty();
+    }
+
+    private static Image aDog() {
+        return new StubImage(new int[] {1, 1, 1, 1});
+    }
+
+    private static Image aBigDog() {
+        return new StubImage(new int[] {1, 1, 1, 1, 1, 1, 1, 1});
+    }
+
+    private record StubImage(int[] pixels) implements Image {
+
+        @Override
+        public int width() {
+            return pixels.length / 2;
+        }
+
+        @Override
+        public int height() {
+            return pixels.length / 2;
+        }
+
     }
 
 }

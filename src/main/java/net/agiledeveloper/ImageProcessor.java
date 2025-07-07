@@ -1,29 +1,53 @@
 package net.agiledeveloper;
 
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ImageProcessor {
 
-    private ImageProcessor() {}
+    private ImageProcessor() {
+    }
 
-    public static Optional<HashCollision> detectCollision(Image a, Image b) {
-        if (!a.hasSize(b)) {
+    public static Optional<Collision> detectCollision(Image imageA, Image imageB) {
+        if (!imageA.hasSize(imageB)) {
             return Optional.empty();
         }
-        throw new UnsupportedOperationException("Not implemented yet");
+        throw new UnsupportedOperationException("not implemented yet");
     }
 
+    public record Hash(byte[] bytes) {
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof Hash(byte[] otherBytes))) return false;
+            return Objects.deepEquals(bytes, otherBytes);
+        }
 
-    public record HashCollision(String hash, Image a, Image b) {
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(bytes);
+        }
+
+        @Override
+        public String toString() {
+            return new String(bytes);
+        }
+    }
+
+    public record Collision(Hash hash, Image a, Image b) {
 
     }
 
-    public record Image(int width, int height) {
+    public interface Image {
 
-        public boolean hasSize(Image other) {
+        int width();
+
+        int height();
+
+        default boolean hasSize(Image other) {
             return (
-                    width == other.width &&
-                    height == other.height
+                    width() == other.width() &&
+                    height() == other.height()
             );
         }
 
