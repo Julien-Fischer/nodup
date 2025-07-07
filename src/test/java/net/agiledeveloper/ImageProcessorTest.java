@@ -20,6 +20,21 @@ class ImageProcessorTest {
         assertThat(potentialMatch).isEmpty();
     }
 
+    @Test
+    void different_images() {
+        Image cat = aCat();
+        Image dog = aDog();
+
+        Optional<Collision> potentialMatch = ImageProcessor.detectCollision(cat, dog);
+
+        assertThat(potentialMatch).isEmpty();
+    }
+
+
+    private static Image aCat() {
+        return new StubImage(new int[] {0, 0, 0, 0});
+    }
+
     private static Image aDog() {
         return new StubImage(new int[] {1, 1, 1, 1});
     }
