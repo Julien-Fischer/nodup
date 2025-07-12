@@ -26,7 +26,7 @@ abstract class ImageProcessorTest {
         Image big = aBigDog();
         Image small = aDog();
 
-        Optional<Collision> potentialMatch = processor.detectCollision(big, small);
+        Collection<Collision> potentialMatch = processor.detectCollisions(big, small);
 
         assertThat(potentialMatch).isEmpty();
     }
@@ -36,7 +36,7 @@ abstract class ImageProcessorTest {
         Image cat = aCat();
         Image dog = aDog();
 
-        Optional<Collision> potentialMatch = processor.detectCollision(cat, dog);
+        Collection<Collision> potentialMatch = processor.detectCollisions(cat, dog);
 
         assertThat(potentialMatch).isEmpty();
     }
@@ -46,9 +46,9 @@ abstract class ImageProcessorTest {
         Image a = aCat();
         Image b = aCat();
 
-        Optional<Collision> potentialMatch = processor.detectCollision(a, b);
+        Collection<Collision> potentialMatch = processor.detectCollisions(a, b);
 
-        assertThat(potentialMatch).isPresent();
+        assertThat(potentialMatch).isNotEmpty();
     }
 
     @Test

@@ -3,9 +3,9 @@ package net.agiledeveloper.image.processors;
 import net.agiledeveloper.image.Image;
 
 import java.util.Collection;
-import java.util.Optional;
 
 import static java.util.Arrays.asList;
+import static net.agiledeveloper.image.collision.HashCollisionDetector.Hash;
 
 public interface ImageProcessor {
 
@@ -15,9 +15,7 @@ public interface ImageProcessor {
 
     Collection<Collision> detectCollisions(Collection<Image> images);
 
-    Optional<Collision> detectCollision(Image imageA, Image imageB);
-
-    record Collision(BruteForceProcessor.Hash hash, Image a, Image b) {
+    record Collision(Hash hash, Image a, Image b) {
 
         @Override
         public String toString() {

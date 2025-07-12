@@ -2,7 +2,9 @@ package net.agiledeveloper;
 
 import net.agiledeveloper.image.IOImage;
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.processors.BruteForceProcessor;
+import net.agiledeveloper.image.collision.CollisionDetector;
+import net.agiledeveloper.image.collision.HashCollisionDetector;
+import net.agiledeveloper.image.processors.ExifImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 
@@ -29,7 +31,12 @@ public class App {
     }
 
     private static ImageProcessor getImageProcessor() {
-        return new BruteForceProcessor();
+//        return new BruteForceProcessor(getCollisionDetector());
+        return new ExifImageProcessor(getCollisionDetector());
+    }
+
+    private static CollisionDetector getCollisionDetector() {
+        return new HashCollisionDetector();
     }
 
     private static void requireValidArguments(String[] args) {
