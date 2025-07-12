@@ -1,7 +1,6 @@
 package net.agiledeveloper.image.processors;
 
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.Image.Dimension;
 import net.agiledeveloper.image.collision.CollisionDetector;
 
 import java.util.*;
@@ -23,7 +22,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {
-        Map<Dimension, PotentialCollision> potentialCollisions = groupByDimension(images)
+        Map<BucketKey, PotentialCollision> potentialCollisions = groupByDiscriminator(images)
                 .filter(atLeastOnePotentialCollision())
                 .collect(toPotentialCollision());
 
@@ -31,7 +30,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
 
-    private List<Collision> findActualCollisions(Map<Dimension, PotentialCollision> potentialCollisions) {
+    private List<Collision> findActualCollisions(Map<BucketKey, PotentialCollision> potentialCollisions) {
         var total = countTotal(potentialCollisions);
         logSummary(total, potentialCollisions);
         logBuckets(toFrequencyMap(potentialCollisions));
@@ -49,13 +48,13 @@ public class ExifImageProcessor extends BruteForceProcessor {
         return collisions;
     }
 
-    private int countTotal(Map<Dimension, PotentialCollision> potentialCollisions) {
+    private int countTotal(Map<BucketKey, PotentialCollision> potentialCollisions) {
         return potentialCollisions.values().stream()
                 .mapToInt(potentialCollision -> potentialCollision.count)
                 .sum();
     }
 
-    private Map<Dimension, Integer> toFrequencyMap(Map<Dimension, PotentialCollision> potentialCollisionMap) {
+    private Map<BucketKey, Integer> toFrequencyMap(Map<BucketKey, PotentialCollision> potentialCollisionMap) {
         return potentialCollisionMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
@@ -63,16 +62,16 @@ public class ExifImageProcessor extends BruteForceProcessor {
                 ));
     }
 
-    private void logSummary(int total, Map<Dimension, PotentialCollision> potentialCollisions) {
+    private void logSummary(int total, Map<BucketKey, PotentialCollision> potentialCollisions) {
         logger.info(() -> format(
                 "Found %s potential collisions over %s buckets:",
                 total, potentialCollisions.size())
         );
     }
 
-    private void logBuckets(Map<Dimension, Integer> map) {
+    private void logBuckets(Map<BucketKey, Integer> map) {
         map.entrySet().stream()
-                .sorted(Entry.<Dimension, Integer>comparingByValue().reversed())
+                .sorted(Entry.<BucketKey, Integer>comparingByValue().reversed())
                 .forEach(printBucket());
     }
 
@@ -81,21 +80,21 @@ public class ExifImageProcessor extends BruteForceProcessor {
         return super.detectCollisions(potentialCollision.images()).stream();
     }
 
-    private static Stream<Entry<Dimension, Collection<Image>>> groupByDimension(Collection<Image> images) {
-        var imagesByDimension = new HashMap<Dimension, Collection<Image>>();
+    private static Stream<Entry<BucketKey, Collection<Image>>> groupByDiscriminator(Collection<Image> images) {
+        var imagesByDiscriminator = new HashMap<BucketKey, Collection<Image>>();
         for (Image image : images) {
-            var dimension = image.dimension();
-            imagesByDimension.putIfAbsent(dimension, new ArrayList<>());
-            imagesByDimension.get(dimension).add(image);
+            var key = new BucketKey(image);
+            imagesByDiscriminator.putIfAbsent(key, new ArrayList<>());
+            imagesByDiscriminator.get(key).add(image);
         }
-        return imagesByDimension.entrySet().stream();
+        return imagesByDiscriminator.entrySet().stream();
     }
 
-    private static Predicate<Entry<Dimension, Collection<Image>>> atLeastOnePotentialCollision() {
+    private static Predicate<Entry<BucketKey, Collection<Image>>> atLeastOnePotentialCollision() {
         return entry -> entry.getValue().size() > 1;
     }
 
-    private Consumer<Entry<Dimension, Integer>> printBucket() {
+    private Consumer<Entry<BucketKey, Integer>> printBucket() {
         return entry -> {
             var stringBuilder = new StringBuilder();
             logger.fine(() -> stringBuilder
@@ -108,7 +107,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
         };
     }
 
-    private static StringBuilder printPotentialCollision(StringBuilder stringBuilder, Entry<Dimension, ?> entry) {
+    private static StringBuilder printPotentialCollision(StringBuilder stringBuilder, Entry<BucketKey, ?> entry) {
         return stringBuilder
                 .append(entry.getValue())
                 .append(": ")
@@ -116,9 +115,9 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
     private static Collector<
-            Entry<Dimension, Collection<Image>>,
+            Entry<BucketKey, Collection<Image>>,
             ?,
-            Map<Dimension, PotentialCollision>
+            Map<BucketKey, PotentialCollision>
     > toPotentialCollision() {
         return Collectors.toMap(
                 Entry::getKey,
@@ -140,6 +139,35 @@ public class ExifImageProcessor extends BruteForceProcessor {
         @Override
         public String toString() {
             return "" + count;
+        }
+    }
+
+    private static class BucketKey {
+
+        private final String value;
+        private final Image.Dimension dimension;
+
+
+        private BucketKey(Image image) {
+            this.dimension = image.dimension();
+            this.value = image.dimension() + "-" + image.format();
+        }
+
+
+        @Override
+        public boolean equals(Object o) {
+            if (!(o instanceof BucketKey bucketKey)) return false;
+            return Objects.equals(value, bucketKey.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+
+        @Override
+        public String toString() {
+            return dimension.toString();
         }
     }
 
