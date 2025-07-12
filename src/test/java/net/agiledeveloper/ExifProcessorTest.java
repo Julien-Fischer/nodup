@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
+import static net.agiledeveloper.ImageProcessorTest.ImageBuilder.aBigDogImage;
 import static net.agiledeveloper.ImageProcessorTest.ImageBuilder.aDogImage;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -24,6 +25,16 @@ class ExifProcessorTest extends ImageProcessorTest {
     void different_formats_do_not_collide() {
         var png = aDogImage().formatted("png").build();
         var jpg = aDogImage().formatted("jpg").build();
+
+        Collection<ImageProcessor.Collision> collisions = processor.detectCollisions(png, jpg);
+
+        assertThat(collisions).isEmpty();
+    }
+
+    @Test
+    void same_formats_but_different_dimension_do_not_collide() {
+        var png = aBigDogImage().formatted("png").build();
+        var jpg = aDogImage().formatted("png").build();
 
         Collection<ImageProcessor.Collision> collisions = processor.detectCollisions(png, jpg);
 
