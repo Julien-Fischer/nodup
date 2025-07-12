@@ -74,7 +74,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
         return entry -> entry.getValue().size() > 1;
     }
 
-    private static Collector<Entry<Dimension, Collection<Image>>, ?, Map<Dimension, Collection<Image>>> identity() {
+    private static <K, V> Collector<Entry<K, V>, ?, Map<K, V>> identity() {
         return Collectors.toMap(
                 Entry::getKey,
                 Entry::getValue
