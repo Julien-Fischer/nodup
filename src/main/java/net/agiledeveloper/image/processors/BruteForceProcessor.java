@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 public class BruteForceProcessor implements ImageProcessor {
 
-    private static final Logger logger = Logger.getLogger(ImageProcessor.class.getSimpleName());
+    protected static final Logger logger = Logger.getLogger(ImageProcessor.class.getSimpleName());
 
     private final CollisionDetector collisionDetector;
 

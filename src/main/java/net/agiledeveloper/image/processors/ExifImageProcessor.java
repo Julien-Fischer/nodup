@@ -26,7 +26,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
     public Collection<Collision> detectCollisions(Collection<Image> images) {
         Map<Dimension, Collection<Image>> imagesByDimension = groupByDimension(images);
 
-        System.out.println(printCount(imagesByDimension));
+        logger.info(() -> printCount(imagesByDimension));
 
         return imagesByDimension.values().stream()
                 .flatMap(this::findCollisions)
