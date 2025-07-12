@@ -25,11 +25,15 @@ public class App {
 
     public static void main(String[] args) {
         requireValidArguments(args);
+        ImageProcessor imageProcessor = processor.algorithm;
+        System.out.println("Image processor: %s".formatted(processor));
+        System.out.println("Collision algorithm: %s".formatted(collider));
 
         String directory = args[0];
         Image[] images = at(directory);
-        ImageProcessor imageProcessor = processor.algorithm;
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
+        System.out.println("#".repeat(40));
+        System.out.println("Found %s collisions:".formatted(collisions.size()));
         for (Collision collision : collisions) {
             System.out.println(collision);
         }
