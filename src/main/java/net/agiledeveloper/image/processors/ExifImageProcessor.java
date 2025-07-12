@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ExifImageProcessor extends BruteForceProcessor {
@@ -21,10 +22,24 @@ public class ExifImageProcessor extends BruteForceProcessor {
     public Collection<Collision> detectCollisions(Collection<Image> images) {
         Map<Dimension, Collection<Image>> imagesByDimension = groupByDimension(images);
 
+        System.out.println(printCount(imagesByDimension));
+
         return imagesByDimension.values().stream()
                 .filter(list -> list.size() > 1)
                 .flatMap(this::findCollisions)
                 .toList();
+    }
+
+    private Map<Dimension, Integer> count(Map<Dimension, Collection<Image>> imagesByDimension) {
+        return imagesByDimension.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue().size()
+                ));
+    }
+
+    private String printCount(Map<Dimension, Collection<Image>> imagesByDimension) {
+        return "" + count(imagesByDimension);
     }
 
 
