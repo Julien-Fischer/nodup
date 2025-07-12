@@ -1,6 +1,7 @@
 package net.agiledeveloper.image.processors;
 
 import net.agiledeveloper.image.Image;
+import net.agiledeveloper.image.Image.Dimension;
 import net.agiledeveloper.image.collision.CollisionDetector;
 
 import java.util.*;
@@ -101,7 +102,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
                     .append("    ")
                     .append(entry.getValue())
                     .append(": ")
-                    .append(entry.getKey())
+                    .append(entry.getKey().displayName())
                     .toString()
             );
         };
@@ -145,7 +146,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
     private static class BucketKey {
 
         private final String value;
-        private final Image.Dimension dimension;
+        private final Dimension dimension;
 
 
         private BucketKey(Image image) {
@@ -153,6 +154,10 @@ public class ExifImageProcessor extends BruteForceProcessor {
             this.value = image.dimension() + "-" + image.format();
         }
 
+
+        public String displayName() {
+            return dimension.toString();
+        }
 
         @Override
         public boolean equals(Object o) {
@@ -167,7 +172,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
         @Override
         public String toString() {
-            return dimension.toString();
+            return value;
         }
     }
 

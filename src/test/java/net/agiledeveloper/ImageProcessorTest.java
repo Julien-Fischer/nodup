@@ -101,7 +101,7 @@ abstract class ImageProcessorTest {
             return this;
         }
 
-        public ImageBuilder formatted(String name) {
+        public ImageBuilder formatted(String format) {
             this.format = format;
             return this;
         }

@@ -23,6 +23,7 @@ public class IOImage implements Image {
 
     @Override
     public String format() {
+        loadIfNecessary();
         return format;
     }
 
@@ -38,9 +39,7 @@ public class IOImage implements Image {
 
     @Override
     public Dimension dimension() {
-        if (dimension == null) {
-            loadDimensions();
-        }
+        loadIfNecessary();
         return dimension;
     }
 
@@ -63,7 +62,13 @@ public class IOImage implements Image {
         return path.getFileName().toString();
     }
 
-    public void loadDimensions() {
+    private void loadIfNecessary() {
+        if (dimension == null) {
+            loadMetadata();
+        }
+    }
+
+    public void loadMetadata() {
         var file = path.toFile();
         try (ImageInputStream in = ImageIO.createImageInputStream(file)) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(in);

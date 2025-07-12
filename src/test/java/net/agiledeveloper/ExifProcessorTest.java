@@ -4,7 +4,6 @@ import net.agiledeveloper.image.collision.CollisionDetector;
 import net.agiledeveloper.image.collision.HashCollisionDetector;
 import net.agiledeveloper.image.processors.ExifImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -21,7 +20,6 @@ class ExifProcessorTest extends ImageProcessorTest {
     }
 
 
-    @Disabled("Implement format detection in exif processor")
     @Test
     void different_formats_do_not_collide() {
         var png = aDogImage().formatted("png").build();
