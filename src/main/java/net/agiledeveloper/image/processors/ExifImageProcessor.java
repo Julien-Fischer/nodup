@@ -46,7 +46,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
     private String accumulate(Map<Dimension, Integer> map) {
-        StringBuilder stringBuilder = new StringBuilder();
+        var stringBuilder = new StringBuilder();
         map.entrySet().stream()
                 .sorted(Entry.<Dimension, Integer>comparingByValue().reversed())
                 .forEach(printEntry(stringBuilder));
