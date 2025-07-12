@@ -36,6 +36,11 @@ public class IOImage implements Image {
     }
 
     @Override
+    public Dimension dimension() {
+        return dimension;
+    }
+
+    @Override
     public int[] pixels() throws IOException {
         if (pixels == null) {
             BufferedImage image = ImageIO.read(path.toFile());

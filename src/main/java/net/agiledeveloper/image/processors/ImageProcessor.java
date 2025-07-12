@@ -5,9 +5,15 @@ import net.agiledeveloper.image.Image;
 import java.util.Collection;
 import java.util.Optional;
 
+import static java.util.Arrays.asList;
+
 public interface ImageProcessor {
 
-    Collection<Collision> detectCollisions(Image... images);
+    default Collection<Collision> detectCollisions(Image... images) {
+        return detectCollisions(asList(images));
+    }
+
+    Collection<Collision> detectCollisions(Collection<Image> images);
 
     Optional<Collision> detectCollision(Image imageA, Image imageB);
 

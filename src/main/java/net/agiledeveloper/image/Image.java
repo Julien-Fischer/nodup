@@ -1,5 +1,6 @@
 package net.agiledeveloper.image;
 
+import java.awt.*;
 import java.io.IOException;
 
 public interface Image {
@@ -7,6 +8,10 @@ public interface Image {
     int width();
 
     int height();
+
+    default Dimension dimension() {
+        return new Dimension(width(), height());
+    }
 
     int[] pixels() throws IOException;
 

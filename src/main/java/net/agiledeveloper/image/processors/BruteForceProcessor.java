@@ -10,13 +10,13 @@ import java.util.*;
 public class BruteForceProcessor implements ImageProcessor {
 
     @Override
-    public Collection<Collision> detectCollisions(Image... images) {
+    public Collection<Collision> detectCollisions(Collection<Image> images) {
         Set<Image> read = new HashSet<>();
         List<Collision> results = new ArrayList<>();
         int i = 0;
         for (var image : images) {
             System.out.println("-".repeat(40));
-            System.out.println("EXIF: " + i + "/" + images.length);
+            System.out.println("EXIF: " + i + "/" + images.size());
             System.out.println("-".repeat(40));
             System.out.println(image);
             if (read.contains(image)) continue;
