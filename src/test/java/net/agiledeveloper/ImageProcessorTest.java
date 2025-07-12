@@ -89,33 +89,56 @@ abstract class ImageProcessorTest {
     }
 
     private static Image aCat() {
-        return new StubImage("aCat", new int[] {0, 0, 0, 0});
+        return new StubImage("aCat", Pixels.CAT, "jpg");
     }
 
     private static Image aDog() {
-        return new StubImage("aDog", new int[] {1, 1, 1, 1});
+        return new StubImage("aDog", Pixels.DOG, "jpg");
     }
 
     private static Image aBigDog() {
-        return new StubImage("aBigDog", new int[] {1, 1, 1, 1, 1, 1, 1, 1});
+        return new StubImage("aBigDog", Pixels.BIG_DOG, "jpg");
     }
 
-    private record StubImage(String name, int[] pixels) implements Image {
+    private record StubImage(String name, Pixels pixelContent, String format) implements Image {
+
+        @Override
+        public int[] pixels() {
+            return pixelContent.pixels;
+        }
 
         @Override
         public int width() {
-            return pixels.length / 2;
+            return pixelContent.length() / 2;
         }
 
         @Override
         public int height() {
-            return pixels.length / 2;
+            return pixelContent.length() / 2;
         }
 
         @Override
         public String toString() {
             return name;
         }
+    }
+
+    private enum Pixels {
+
+        BIG_DOG (new int[] {1, 1, 1, 1, 1, 1, 1, 1}),
+        DOG     (new int[] {1, 1, 1, 1}),
+        CAT     (new int[] {0, 0, 0, 0});
+
+        private final int[] pixels;
+
+        Pixels(int[] pixels) {
+            this.pixels = pixels;
+        }
+
+        int length() {
+            return pixels.length;
+        }
+
     }
 
 }

@@ -13,9 +13,17 @@ public class IOImage implements Image {
     private final Path path;
     private int[] pixels;
     private Dimension dimension;
+    private String format;
+
 
     public IOImage(Path path) {
         this.path = path;
+    }
+
+
+    @Override
+    public String format() {
+        return format;
     }
 
     @Override
@@ -66,6 +74,7 @@ public class IOImage implements Image {
             reader.setInput(in);
             var width = reader.getWidth(0);
             var height = reader.getHeight(0);
+            format = reader.getFormatName();
             dimension = new Dimension(width, height);
             reader.dispose();
         } catch (IOException e) {

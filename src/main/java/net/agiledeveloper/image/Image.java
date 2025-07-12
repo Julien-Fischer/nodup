@@ -4,6 +4,8 @@ import java.io.IOException;
 
 public interface Image {
 
+    String format();
+
     int width();
 
     int height();
