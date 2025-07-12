@@ -7,7 +7,8 @@ import net.agiledeveloper.image.collision.CollisionDetector;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static java.util.logging.Level.*;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.FINEST;
 
 public class BruteForceProcessor implements ImageProcessor {
 
@@ -31,7 +32,7 @@ public class BruteForceProcessor implements ImageProcessor {
         int size = images.size();
         for (var image : images) {
             logger.log(FINER, () -> "-".repeat(40));
-            logger.log(INFO, printProgress(i, size));
+            logger.log(FINER, printProgress(i, size));
             logger.log(FINER, () -> "-".repeat(40));
             logger.log(FINER, image::toString);
             if (read.contains(image)) continue;
@@ -50,9 +51,13 @@ public class BruteForceProcessor implements ImageProcessor {
         return results;
     }
 
-    private static String printProgress(int i, int n) {
+    protected static String printProgress(int i, int n) {
+        return printProgress(i, n, "Image");
+    }
+
+    protected static String printProgress(int i, int n, String prefix) {
         var percent = ((float) i / (float) n) * 100;
-        return "Image: %s / %s (%s)".formatted(i, n, percent + "%");
+        return "%s: %s / %s (%s)".formatted(prefix, i, n, percent + "%");
     }
 
 }
