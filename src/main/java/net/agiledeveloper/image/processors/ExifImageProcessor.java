@@ -1,13 +1,16 @@
 package net.agiledeveloper.image.processors;
 
 import net.agiledeveloper.image.Image;
+import net.agiledeveloper.image.Image.Dimension;
 import net.agiledeveloper.image.collision.CollisionDetector;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,7 +28,6 @@ public class ExifImageProcessor extends BruteForceProcessor {
         System.out.println(printCount(imagesByDimension));
 
         return imagesByDimension.values().stream()
-                .filter(list -> list.size() > 1)
                 .flatMap(this::findCollisions)
                 .toList();
     }
@@ -33,7 +35,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
     private Map<Dimension, Integer> count(Map<Dimension, Collection<Image>> imagesByDimension) {
         return imagesByDimension.entrySet().stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        Entry::getKey,
                         entry -> entry.getValue().size()
                 ));
     }
@@ -54,7 +56,20 @@ public class ExifImageProcessor extends BruteForceProcessor {
             imagesByDimension.putIfAbsent(dimension, new ArrayList<>());
             imagesByDimension.get(dimension).add(image);
         }
-        return imagesByDimension;
+        return imagesByDimension.entrySet().stream()
+                .filter(atLeastOnePotentialCollision())
+                .collect(identity());
+    }
+
+    private static Predicate<Entry<Dimension, Collection<Image>>> atLeastOnePotentialCollision() {
+        return entry -> entry.getValue().size() > 1;
+    }
+
+    private static Collector<Entry<Dimension, Collection<Image>>, ?, Map<Dimension, Collection<Image>>> identity() {
+        return Collectors.toMap(
+                Entry::getKey,
+                Entry::getValue
+        );
     }
 
 }

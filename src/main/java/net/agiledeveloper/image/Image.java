@@ -1,6 +1,5 @@
 package net.agiledeveloper.image;
 
-import java.awt.*;
 import java.io.IOException;
 
 public interface Image {
@@ -20,6 +19,15 @@ public interface Image {
                 width() == other.width() &&
                 height() == other.height()
         );
+    }
+
+
+    record Dimension(int width, int height) {
+
+        @Override
+        public String toString() {
+            return "%sx%spx".formatted(width, height);
+        }
     }
 
 }

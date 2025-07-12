@@ -3,7 +3,6 @@ package net.agiledeveloper.image;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -21,12 +20,12 @@ public class IOImage implements Image {
 
     @Override
     public int width() {
-        return dimension().width;
+        return dimension().width();
     }
 
     @Override
     public int height() {
-        return dimension().height;
+        return dimension().height();
     }
 
     @Override
