@@ -31,8 +31,7 @@ public class App {
 
     public static void main(String[] args) {
         requireValidArguments(args);
-        logger.setLevel(LOG_LEVEL);
-
+        setLogLevel(LOG_LEVEL);
 
         ImageProcessor imageProcessor = processor.algorithm;
         logger.info(() -> "Image processor: %s".formatted(processor));
@@ -77,6 +76,13 @@ public class App {
             return stream
                     .filter(Files::isRegularFile)
                     .toList();
+        }
+    }
+
+    private static void setLogLevel(Level level) {
+        logger.setLevel(level);
+        for (var handler : Logger.getLogger("").getHandlers()) {
+            handler.setLevel(level);
         }
     }
 
