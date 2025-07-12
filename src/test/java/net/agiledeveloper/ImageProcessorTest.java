@@ -14,7 +14,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 abstract class ImageProcessorTest {
 
-    private final ImageProcessor processor;
+    protected final ImageProcessor processor;
 
 
     public ImageProcessorTest(ImageProcessor processor) {
@@ -101,7 +101,7 @@ abstract class ImageProcessorTest {
             return this;
         }
 
-        public ImageBuilder withFormat(String name) {
+        public ImageBuilder formatted(String name) {
             this.format = format;
             return this;
         }
@@ -118,19 +118,19 @@ abstract class ImageProcessorTest {
 
         public static Image aCat() {
             return aCatImage()
-                    .withFormat("jpg")
+                    .formatted("jpg")
                     .build();
         }
 
         public static Image aDog() {
             return aDogImage()
-                    .withFormat("jpg")
+                    .formatted("jpg")
                     .build();
         }
 
         public static Image aBigDog() {
             return aBigDogImage()
-                    .withFormat("jpg")
+                    .formatted("jpg")
                     .build();
         }
 
