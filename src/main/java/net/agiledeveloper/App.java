@@ -16,10 +16,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class App {
 
+    public static final Level LOG_LEVEL = Level.FINEST;
     private static final Collider collider = Collider.PIXEL;
     private static final Processor processor = Processor.EXIF;
 
@@ -28,18 +30,26 @@ public class App {
 
     public static void main(String[] args) {
         requireValidArguments(args);
+        logger.setLevel(LOG_LEVEL);
+
+
         ImageProcessor imageProcessor = processor.algorithm;
-        logger.info("Image processor: %s".formatted(processor));
-        logger.info("Collision algorithm: %s".formatted(collider));
+        logger.info(() -> "Image processor: %s".formatted(processor));
+        logger.info(() -> "Collision algorithm: %s".formatted(collider));
+
+        long start = System.nanoTime();
 
         String directory = args[0];
         Image[] images = at(directory);
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
-        logger.info("#".repeat(40));
-        logger.info("Found %s collisions:".formatted(collisions.size()));
+        logger.info(() -> "#".repeat(40));
+        logger.info(() -> "Found %s collisions:".formatted(collisions.size()));
         for (Collision collision : collisions) {
-            System.out.println(collision);
+            logger.info(() -> "" + collision);
         }
+
+        long end = System.nanoTime();
+        logger.info(() -> "Elapsed time: %s ns".formatted(end - start));
     }
 
 

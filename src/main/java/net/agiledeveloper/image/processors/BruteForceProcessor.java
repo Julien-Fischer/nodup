@@ -1,5 +1,6 @@
 package net.agiledeveloper.image.processors;
 
+import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.collision.CollisionDetector;
 
@@ -9,13 +10,15 @@ import java.util.logging.Logger;
 
 public class BruteForceProcessor implements ImageProcessor {
 
-    protected static final Logger logger = Logger.getLogger(ImageProcessor.class.getSimpleName());
+    protected final Logger logger = Logger.getLogger(ImageProcessor.class.getSimpleName());
+
 
     private final CollisionDetector collisionDetector;
 
 
     public BruteForceProcessor(CollisionDetector collisionDetector) {
         this.collisionDetector = collisionDetector;
+        logger.setLevel(App.LOG_LEVEL);
     }
 
 
@@ -24,14 +27,15 @@ public class BruteForceProcessor implements ImageProcessor {
         Set<Image> read = new HashSet<>();
         List<Collision> results = new ArrayList<>();
         int i = 0;
+        int size = images.size();
         for (var image : images) {
-            logger.log(Level.FINER, "-".repeat(40));
-            logger.log(Level.FINER, "Image: " + i + "/" + images.size());
-            logger.log(Level.FINER, "-".repeat(40));
-            logger.log(Level.FINER, image.toString());
+            logger.log(Level.FINER, () -> "-".repeat(40));
+            logger.log(Level.FINER, printProgress(i, size));
+            logger.log(Level.FINER, () -> "-".repeat(40));
+            logger.log(Level.FINER, image::toString);
             if (read.contains(image)) continue;
             for (var other : images) {
-                logger.log(Level.FINEST, "    " + other);
+                logger.log(Level.FINEST, () -> "    " + other);
                 if (!image.hasSize(other)) continue;
                 if (read.contains(other) || image == other) continue;
                 Optional<Collision> potentialCollision = collisionDetector.of(image, other);
@@ -43,6 +47,11 @@ public class BruteForceProcessor implements ImageProcessor {
             i++;
         }
         return results;
+    }
+
+    private static String printProgress(int i, int n) {
+        int percent = i / n * 100;
+        return "Image: %s / %s (%s)".formatted(i, n, percent);
     }
 
 }

@@ -24,11 +24,11 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {
-        Map<Dimension, Collection<Image>> imagesByDimension = groupByDimension(images);
+        Map<Dimension, Collection<Image>> potentialCollisions = groupByDimension(images);
 
-        logger.info(() -> printCount(imagesByDimension));
+        logger.info(() -> printCount(potentialCollisions));
 
-        return imagesByDimension.values().stream()
+        return potentialCollisions.values().stream()
                 .flatMap(this::findCollisions)
                 .toList();
     }

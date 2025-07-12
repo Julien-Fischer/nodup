@@ -22,7 +22,7 @@ public class HashCollisionDetector implements CollisionDetector {
         return Optional.of(new Collision(imageA, imageB));
     }
 
-    public static Hash hashPixels(Image image) {
+    private static Hash hashPixels(Image image) {
         var pixels = readPixels(image);
         var messageDigest = getMessageDigest();
         for (int pixel : pixels) {
