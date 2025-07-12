@@ -4,6 +4,7 @@ import net.agiledeveloper.image.IOImage;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.collision.CollisionDetector;
 import net.agiledeveloper.image.collision.HashCollisionDetector;
+import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
@@ -17,27 +18,22 @@ import java.util.List;
 
 public class App {
 
-    private static final ImageProcessor imageProcessor = getImageProcessor();
+    private static final Collider collider = Collider.HASH;
+    private static final Processor processor = Processor.EXIF;
+
 
     public static void main(String[] args) {
         requireValidArguments(args);
 
         String directory = args[0];
         Image[] images = at(directory);
+        ImageProcessor imageProcessor = processor.algorithm;
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
         for (Collision collision : collisions) {
             System.out.println(collision);
         }
     }
 
-    private static ImageProcessor getImageProcessor() {
-//        return new BruteForceProcessor(getCollisionDetector());
-        return new ExifImageProcessor(getCollisionDetector());
-    }
-
-    private static CollisionDetector getCollisionDetector() {
-        return new HashCollisionDetector();
-    }
 
     private static void requireValidArguments(String[] args) {
         if (args.length == 0) {
@@ -62,6 +58,31 @@ public class App {
                     .filter(Files::isRegularFile)
                     .toList();
         }
+    }
+
+    private enum Collider {
+
+        HASH (new HashCollisionDetector());
+
+        private final CollisionDetector algorithm;
+
+        Collider(CollisionDetector algorithm) {
+            this.algorithm = algorithm;
+        }
+
+    }
+
+    private enum Processor {
+
+        EXIF (new ExifImageProcessor(collider.algorithm)),
+        BRUTE_FORCE (new BruteForceProcessor(collider.algorithm));
+
+        private final ImageProcessor algorithm;
+
+        Processor(ImageProcessor algorithm) {
+            this.algorithm = algorithm;
+        }
+
     }
 
 }

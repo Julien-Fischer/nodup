@@ -22,7 +22,7 @@ public class BruteForceProcessor implements ImageProcessor {
         int i = 0;
         for (var image : images) {
             System.out.println("-".repeat(40));
-            System.out.println("EXIF: " + i + "/" + images.size());
+            System.out.println("Image: " + i + "/" + images.size());
             System.out.println("-".repeat(40));
             System.out.println(image);
             if (read.contains(image)) continue;
