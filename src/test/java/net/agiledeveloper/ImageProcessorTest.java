@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 import java.util.Optional;
 
+import static net.agiledeveloper.ImageProcessorTest.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -88,16 +89,69 @@ abstract class ImageProcessorTest {
 
     }
 
-    private static Image aCat() {
-        return new StubImage("aCat", Pixels.CAT, "jpg");
-    }
 
-    private static Image aDog() {
-        return new StubImage("aDog", Pixels.DOG, "jpg");
-    }
+    public static class ImageBuilder {
 
-    private static Image aBigDog() {
-        return new StubImage("aBigDog", Pixels.BIG_DOG, "jpg");
+        private String name = "an image";
+        private String format = "jpg";
+        private Pixels pixels = Pixels.CAT;
+
+        public ImageBuilder named(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ImageBuilder withFormat(String name) {
+            this.format = format;
+            return this;
+        }
+
+        public ImageBuilder withPixels(Pixels pixels) {
+            this.pixels = pixels;
+            return this;
+        }
+
+        public Image build() {
+            return new StubImage(name, pixels, format);
+        }
+
+
+        public static Image aCat() {
+            return aCatImage()
+                    .withFormat("jpg")
+                    .build();
+        }
+
+        public static Image aDog() {
+            return aDogImage()
+                    .withFormat("jpg")
+                    .build();
+        }
+
+        public static Image aBigDog() {
+            return aBigDogImage()
+                    .withFormat("jpg")
+                    .build();
+        }
+
+        public static ImageBuilder aBigDogImage() {
+            return new ImageBuilder()
+                    .named("a_big_dog")
+                    .withPixels(Pixels.BIG_DOG);
+        }
+
+        public static ImageBuilder aDogImage() {
+            return new ImageBuilder()
+                    .named("a_dog")
+                    .withPixels(Pixels.DOG);
+        }
+
+        public static ImageBuilder aCatImage() {
+            return new ImageBuilder()
+                    .named("a_cat")
+                    .withPixels(Pixels.CAT);
+        }
+
     }
 
     private record StubImage(String name, Pixels pixelContent, String format) implements Image {
