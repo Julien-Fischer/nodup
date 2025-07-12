@@ -1,6 +1,10 @@
 package net.agiledeveloper;
 
-import net.agiledeveloper.ImageProcessor.Collision;
+import net.agiledeveloper.image.IOImage;
+import net.agiledeveloper.image.Image;
+import net.agiledeveloper.image.processors.BruteForceProcessor;
+import net.agiledeveloper.image.processors.ImageProcessor;
+import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 
 import java.io.IOException;
 import java.nio.file.Files;

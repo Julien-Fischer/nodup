@@ -1,4 +1,4 @@
-package net.agiledeveloper;
+package net.agiledeveloper.image;
 
 import java.io.IOException;
 

@@ -1,4 +1,6 @@
-package net.agiledeveloper;
+package net.agiledeveloper.image.processors;
+
+import net.agiledeveloper.image.Image;
 
 import java.io.IOException;
 import java.security.MessageDigest;
