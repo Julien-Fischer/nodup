@@ -4,8 +4,12 @@ import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.collision.CollisionDetector;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class BruteForceProcessor implements ImageProcessor {
+
+    private static final Logger logger = Logger.getLogger(ImageProcessor.class.getSimpleName());
 
     private final CollisionDetector collisionDetector;
 
@@ -21,13 +25,13 @@ public class BruteForceProcessor implements ImageProcessor {
         List<Collision> results = new ArrayList<>();
         int i = 0;
         for (var image : images) {
-            System.out.println("-".repeat(40));
-            System.out.println("Image: " + i + "/" + images.size());
-            System.out.println("-".repeat(40));
-            System.out.println(image);
+            logger.log(Level.FINER, "-".repeat(40));
+            logger.log(Level.FINER, "Image: " + i + "/" + images.size());
+            logger.log(Level.FINER, "-".repeat(40));
+            logger.log(Level.FINER, image.toString());
             if (read.contains(image)) continue;
             for (var other : images) {
-                System.out.println("    " + other);
+                logger.log(Level.FINEST, "    " + other);
                 if (!image.hasSize(other)) continue;
                 if (read.contains(other) || image == other) continue;
                 Optional<Collision> potentialCollision = collisionDetector.of(image, other);
