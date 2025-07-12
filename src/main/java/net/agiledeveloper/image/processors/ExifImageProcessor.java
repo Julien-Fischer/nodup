@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -41,7 +42,15 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
     private String printCount(Map<Dimension, Collection<Image>> imagesByDimension) {
-        return "" + count(imagesByDimension);
+        return accumulate(count(imagesByDimension));
+    }
+
+    private String accumulate(Map<Dimension, Integer> map) {
+        StringBuilder stringBuilder = new StringBuilder();
+        map.entrySet().stream()
+                .sorted(Entry.<Dimension, Integer>comparingByValue().reversed())
+                .forEach(printEntry(stringBuilder));
+        return stringBuilder.toString();
     }
 
 
@@ -70,6 +79,14 @@ public class ExifImageProcessor extends BruteForceProcessor {
                 Entry::getKey,
                 Entry::getValue
         );
+    }
+
+    private static Consumer<Entry<Dimension, Integer>> printEntry(StringBuilder stringBuilder) {
+        return entry -> stringBuilder
+                .append(entry.getValue())
+                .append(": ")
+                .append(entry.getKey())
+                .append("\n");
     }
 
 }
