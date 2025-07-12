@@ -21,22 +21,19 @@ public class IOImage implements Image {
 
     @Override
     public int width() {
-        if (dimension == null) {
-            loadDimensions();
-        }
-        return dimension.width;
+        return dimension().width;
     }
 
     @Override
     public int height() {
-        if (dimension == null) {
-            loadDimensions();
-        }
-        return dimension.height;
+        return dimension().height;
     }
 
     @Override
     public Dimension dimension() {
+        if (dimension == null) {
+            loadDimensions();
+        }
         return dimension;
     }
 
