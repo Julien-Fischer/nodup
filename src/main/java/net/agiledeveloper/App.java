@@ -30,7 +30,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 
 public class App {
 
-    public static final Level LOG_LEVEL = Level.FINEST;
+    public static final Level LOG_LEVEL = Level.INFO;
     private static final Collider collider = Collider.PIXEL;
     private static final Processor processor = Processor.EXIF;
 
