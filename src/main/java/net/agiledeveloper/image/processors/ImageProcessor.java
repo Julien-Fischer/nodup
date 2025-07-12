@@ -5,7 +5,6 @@ import net.agiledeveloper.image.Image;
 import java.util.Collection;
 
 import static java.util.Arrays.asList;
-import static net.agiledeveloper.image.collision.HashCollisionDetector.Hash;
 
 public interface ImageProcessor {
 
@@ -15,7 +14,7 @@ public interface ImageProcessor {
 
     Collection<Collision> detectCollisions(Collection<Image> images);
 
-    record Collision(Hash hash, Image a, Image b) {
+    record Collision(Image a, Image b) {
 
         @Override
         public String toString() {

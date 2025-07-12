@@ -19,7 +19,7 @@ public class HashCollisionDetector implements CollisionDetector {
         if (!a.equals(b)) {
             return Optional.empty();
         }
-        return Optional.of(new Collision(a, imageA, imageB));
+        return Optional.of(new Collision(imageA, imageB));
     }
 
     public static Hash hashPixels(Image image) {
@@ -52,7 +52,7 @@ public class HashCollisionDetector implements CollisionDetector {
         return sha256;
     }
 
-    public record Hash(byte[] bytes) {
+    private record Hash(byte[] bytes) {
         @Override
         public boolean equals(Object o) {
             if (!(o instanceof Hash(byte[] otherBytes))) return false;

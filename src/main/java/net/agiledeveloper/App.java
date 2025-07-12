@@ -4,6 +4,7 @@ import net.agiledeveloper.image.IOImage;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.collision.CollisionDetector;
 import net.agiledeveloper.image.collision.HashCollisionDetector;
+import net.agiledeveloper.image.collision.PixelCollisionDetector;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class App {
 
-    private static final Collider collider = Collider.HASH;
+    private static final Collider collider = Collider.PIXEL;
     private static final Processor processor = Processor.EXIF;
 
 
@@ -62,7 +63,8 @@ public class App {
 
     private enum Collider {
 
-        HASH (new HashCollisionDetector());
+        HASH  (new HashCollisionDetector()),
+        PIXEL (new PixelCollisionDetector());
 
         private final CollisionDetector algorithm;
 
