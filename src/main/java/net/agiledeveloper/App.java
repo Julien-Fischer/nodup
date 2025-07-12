@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -49,7 +50,8 @@ public class App {
         }
 
         long end = System.nanoTime();
-        logger.info(() -> "Elapsed time: %s ns".formatted(end - start));
+        var duration = Duration.ofNanos(end - start);
+        logger.info(() -> "Elapsed time: %s ms".formatted(duration.toMillis()));
     }
 
 

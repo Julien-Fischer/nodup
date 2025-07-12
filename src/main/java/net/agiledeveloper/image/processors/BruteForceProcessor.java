@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 public class BruteForceProcessor implements ImageProcessor {
 
-    protected final Logger logger = Logger.getLogger(ImageProcessor.class.getSimpleName());
+    protected final Logger logger = Logger.getLogger(getClass().getSimpleName());
 
 
     private final CollisionDetector collisionDetector;
@@ -29,10 +29,10 @@ public class BruteForceProcessor implements ImageProcessor {
         int i = 0;
         int size = images.size();
         for (var image : images) {
-            logger.log(Level.FINER, () -> "-".repeat(40));
-            logger.log(Level.FINER, printProgress(i, size));
-            logger.log(Level.FINER, () -> "-".repeat(40));
-            logger.log(Level.FINER, image::toString);
+            logger.log(Level.INFO, () -> "-".repeat(40));
+            logger.log(Level.INFO, printProgress(i, size));
+            logger.log(Level.INFO, () -> "-".repeat(40));
+            logger.log(Level.INFO, image::toString);
             if (read.contains(image)) continue;
             for (var other : images) {
                 logger.log(Level.FINEST, () -> "    " + other);
