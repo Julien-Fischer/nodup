@@ -11,15 +11,21 @@ import java.util.List;
 
 public class App {
 
+    private static final ImageProcessor imageProcessor = getImageProcessor();
+
     public static void main(String[] args) {
         requireValidArguments(args);
 
         String directory = args[0];
         Image[] images = at(directory);
-        Collection<Collision> collisions = ImageProcessor.detectCollisions(images);
+        Collection<Collision> collisions = imageProcessor.detectCollisions(images);
         for (Collision collision : collisions) {
             System.out.println(collision);
         }
+    }
+
+    private static ImageProcessor getImageProcessor() {
+        return new BruteForceProcessor();
     }
 
     private static void requireValidArguments(String[] args) {

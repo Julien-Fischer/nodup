@@ -9,14 +9,16 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-class ImageProcessorTest {
+class BruteForceProcessorTest {
+
+    private final BruteForceProcessor processor = new BruteForceProcessor();
 
     @Test
     void different_dimensions() {
         Image big = aBigDog();
         Image small = aDog();
 
-        Optional<Collision> potentialMatch = ImageProcessor.detectCollision(big, small);
+        Optional<Collision> potentialMatch = processor.detectCollision(big, small);
 
         assertThat(potentialMatch).isEmpty();
     }
@@ -26,7 +28,7 @@ class ImageProcessorTest {
         Image cat = aCat();
         Image dog = aDog();
 
-        Optional<Collision> potentialMatch = ImageProcessor.detectCollision(cat, dog);
+        Optional<Collision> potentialMatch = processor.detectCollision(cat, dog);
 
         assertThat(potentialMatch).isEmpty();
     }
@@ -36,7 +38,7 @@ class ImageProcessorTest {
         Image a = aCat();
         Image b = aCat();
 
-        Optional<Collision> potentialMatch = ImageProcessor.detectCollision(a, b);
+        Optional<Collision> potentialMatch = processor.detectCollision(a, b);
 
         assertThat(potentialMatch).isPresent();
     }
@@ -45,7 +47,7 @@ class ImageProcessorTest {
     void detect_zero_collision() {
         Image[] images = {aDog(), aCat(), aBigDog()};
 
-        Collection<Collision> collisions = ImageProcessor.detectCollisions(images);
+        Collection<Collision> collisions = processor.detectCollisions(images);
 
         assertThat(collisions).isEmpty();
     }
@@ -56,7 +58,7 @@ class ImageProcessorTest {
         var b = aDog();
         Image[] images = {a, aBigDog(), b, aCat()};
 
-        Collection<Collision> collisions = ImageProcessor.detectCollisions(images);
+        Collection<Collision> collisions = processor.detectCollisions(images);
 
         expect(collisions).toBe(a, b);
     }
