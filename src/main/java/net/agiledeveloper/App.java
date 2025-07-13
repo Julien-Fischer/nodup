@@ -29,7 +29,8 @@ public class App {
     public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
     private static final Collider COLLIDER = Collider.PIXEL;
     private static final Processor PROCESSOR = Processor.EXIF;
-    public static final String COLLISION_BIN_NAME = "collision_bin";
+    public static final String APP_DIR = "nodup";
+    public static final String COLLISION_BIN_NAME = "%s/bin".formatted(APP_DIR);
 
     private static final Logger logger = Logger.getLogger(App.class.getSimpleName());
     public static ImageProvider imageProvider = new SimpleImageProvider();
