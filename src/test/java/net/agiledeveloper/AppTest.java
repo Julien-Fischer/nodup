@@ -1,7 +1,9 @@
 package net.agiledeveloper;
 
+import net.agiledeveloper.image.Image;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -14,6 +16,7 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 class AppTest {
@@ -55,12 +58,34 @@ class AppTest {
     }
 
     @Test
-    void with_input_directory() throws IOException {
-        havingDirectoryNamed("directory");
+    void with_no_images() throws IOException {
+        havingDirectoryNamed("directory")
+                .empty();
 
         whenStartingAppWithParameters(directory.toString());
 
         assertThatNoFilesWereFound();
+    }
+
+    @Test
+    void with_images_but_no_collision() throws IOException {
+        havingDirectoryNamed("directory")
+                .containing(aBigDog(), aDog(), aCat());
+
+        whenStartingAppWithParameters(directory.toString());
+
+        assertThatNoFilesWereFound();
+    }
+
+    @Disabled("implement")
+    @Test
+    void with_collisions() throws IOException {
+        havingDirectoryNamed("directory")
+                .containing(aBigDog(), aDog(), aDog(), aCat());
+
+        whenStartingAppWithParameters(directory.toString());
+
+        assertThatFilesWereFound(aDog());
     }
 
 
@@ -72,13 +97,19 @@ class AppTest {
         App.main(parameters);
     }
 
-    private void havingDirectoryNamed(String directory) throws IOException {
+    private FilePrecondition havingDirectoryNamed(String directory) throws IOException {
         this.directory = tempDir.resolve(directory);
         Files.createDirectory(this.directory);
+        return new FilePrecondition();
     }
 
     private void assertThatNoFilesWereFound() {
         assertThatLogContains("Found 0 collisions");
+    }
+
+    private void assertThatFilesWereFound(Image... images) {
+        assertThatLogContains("Found %s collisions".formatted(images.length));
+        // TODO: assert that contains image names
     }
 
     private void assertThatStdoutContains(String expected) {
@@ -128,6 +159,18 @@ class AppTest {
         public String getMessages() {
             return messages;
         }
+    }
+
+    static class FilePrecondition {
+
+        public void empty() {
+
+        }
+
+        public void containing(Image... images) {
+
+        }
+
     }
 
 }

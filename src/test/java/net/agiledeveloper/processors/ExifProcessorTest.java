@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
-import static net.agiledeveloper.processors.ImageProcessorTest.ImageBuilder.aBigDogImage;
-import static net.agiledeveloper.processors.ImageProcessorTest.ImageBuilder.aDogImage;
+import static net.agiledeveloper.stubs.StubImage.ImageBuilder.aBigDogImage;
+import static net.agiledeveloper.stubs.StubImage.ImageBuilder.aDogImage;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class ExifProcessorTest extends ImageProcessorTest {
