@@ -72,7 +72,9 @@ class AppTest {
     void without_parameters_fails() throws IOException {
         havingDirectoryNamed("directory");
 
-        whenStartingAppWithoutParameters();
+
+        whenStartingApp()
+                .withoutAnyParameter();
 
         assertThatLogContains(System.getProperty("user.dir"));
     }
@@ -82,7 +84,9 @@ class AppTest {
         havingDirectoryNamed("directory")
                 .empty();
 
-        whenStartingAppWithParameters(directoryToScan.toString());
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString());
 
         assertThatNoFilesWereFound();
     }
@@ -92,7 +96,9 @@ class AppTest {
         havingDirectoryNamed("directory")
                 .containing(aBigDog(), aDog(), aCat());
 
-        whenStartingAppWithParameters(directoryToScan.toString());
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString());
 
         assertThatFilesWereFound(3);
         assertThatNoDuplicatesWereFound();
@@ -105,7 +111,9 @@ class AppTest {
         havingDirectoryNamed("directory")
                 .containing(aBigDog(), a, b, aCat());
 
-        whenStartingAppWithParameters(directoryToScan.toString());
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString());
 
         assertThatDuplicatesWereFound(1)
                 .forImages(a, b);
@@ -119,7 +127,9 @@ class AppTest {
         givenThat(directoryToScan)
                 .contains(aBigDog(), a, b, aCat());
 
-        whenStartingAppWithParameters(directoryToScan.toString(), "--move");
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--move");
 
         assertThatDuplicatesWereMoved(1)
                 .forImages(a);
@@ -133,7 +143,9 @@ class AppTest {
         givenThat(directoryToScan)
                 .contains(aBigDog(), a, b, aCat());
 
-        whenStartingAppWithParameters(directoryToScan.toString(), "--copy");
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--copy");
 
         assertThatDuplicatesWereCopied(1)
                 .forImages(a);
@@ -143,7 +155,8 @@ class AppTest {
     void it_uses_default_log_level() throws IOException {
         havingDirectoryNamed("directory");
 
-        whenStartingAppWithParameters(directoryToScan.toString());
+        whenStartingApp()
+                .withParameters(directoryToScan.toString());
 
         assertThatLogContains("Log level: INFO");
     }
@@ -152,7 +165,8 @@ class AppTest {
     void it_uses_specified_log_level() throws IOException {
         havingDirectoryNamed("directory");
 
-        whenStartingAppWithParameters(directoryToScan.toString(), "--log=fine");
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--log=fine");
 
         assertThatLogContains("Log level: FINE");
     }
@@ -161,19 +175,28 @@ class AppTest {
     void it_uses_specified_log_level_when_no_positional_parameters() throws IOException {
         havingDirectoryNamed("directory");
 
-        whenStartingAppWithParameters("--log=fine");
+        whenStartingApp()
+                .withParameters("--log=fine");
 
         assertThatLogContains(System.getProperty("user.dir"));
         assertThatLogContains("Log level: FINE");
     }
 
 
-    private void whenStartingAppWithoutParameters() {
-        whenStartingAppWithParameters();
+    private AppAction whenStartingApp(String... parameters) {
+        return new AppAction(parameters);
     }
 
-    private void whenStartingAppWithParameters(String... parameters) {
-        App.main(parameters);
+    private record AppAction(String... parameters) {
+
+        void withoutAnyParameter() {
+            App.main(new String[0]);
+        }
+
+        void withParameters(String... parameters) {
+            App.main(parameters);
+        }
+
     }
 
     private FilePrecondition givenThat(Path directory) {
