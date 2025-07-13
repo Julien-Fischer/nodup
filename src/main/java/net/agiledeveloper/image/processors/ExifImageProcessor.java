@@ -24,7 +24,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {
-        Map<BucketKey, PotentialCollision> potentialCollisions = groupByDiscriminator(images)
+        Map<Discriminator, PotentialCollision> potentialCollisions = groupByDiscriminator(images)
                 .filter(atLeastOnePotentialCollision())
                 .collect(toPotentialCollision());
 
@@ -32,7 +32,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
 
-    private List<Collision> findActualCollisions(Map<BucketKey, PotentialCollision> potentialCollisions) {
+    private List<Collision> findActualCollisions(Map<Discriminator, PotentialCollision> potentialCollisions) {
         var total = countTotal(potentialCollisions);
         logSummary(total, potentialCollisions);
         logBuckets(toFrequencyMap(potentialCollisions));
@@ -51,13 +51,13 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
 
-    private int countTotal(Map<BucketKey, PotentialCollision> potentialCollisions) {
+    private int countTotal(Map<Discriminator, PotentialCollision> potentialCollisions) {
         return potentialCollisions.values().stream()
                 .mapToInt(potentialCollision -> potentialCollision.count)
                 .sum();
     }
 
-    private Map<BucketKey, Integer> toFrequencyMap(Map<BucketKey, PotentialCollision> potentialCollisionMap) {
+    private Map<Discriminator, Integer> toFrequencyMap(Map<Discriminator, PotentialCollision> potentialCollisionMap) {
         return potentialCollisionMap.entrySet().stream()
                 .collect(Collectors.toMap(
                         Entry::getKey,
@@ -65,16 +65,16 @@ public class ExifImageProcessor extends BruteForceProcessor {
                 ));
     }
 
-    private void logSummary(int total, Map<BucketKey, PotentialCollision> potentialCollisions) {
+    private void logSummary(int total, Map<Discriminator, PotentialCollision> potentialCollisions) {
         logger.info(() -> format(
                 "Found %s potential collisions over %s buckets:",
                 total, potentialCollisions.size())
         );
     }
 
-    private void logBuckets(Map<BucketKey, Integer> map) {
+    private void logBuckets(Map<Discriminator, Integer> map) {
         map.entrySet().stream()
-                .sorted(Entry.<BucketKey, Integer>comparingByValue().reversed())
+                .sorted(Entry.<Discriminator, Integer>comparingByValue().reversed())
                 .forEach(printBucket());
     }
 
@@ -83,21 +83,21 @@ public class ExifImageProcessor extends BruteForceProcessor {
         return super.detectCollisions(potentialCollision.images()).stream();
     }
 
-    private static Stream<Entry<BucketKey, Collection<Image>>> groupByDiscriminator(Collection<Image> images) {
-        var imagesByDiscriminator = new HashMap<BucketKey, Collection<Image>>();
+    private static Stream<Entry<Discriminator, Collection<Image>>> groupByDiscriminator(Collection<Image> images) {
+        var imagesByDiscriminator = new HashMap<Discriminator, Collection<Image>>();
         for (Image image : images) {
-            var key = new BucketKey(image);
+            var key = new Discriminator(image);
             imagesByDiscriminator.putIfAbsent(key, new ArrayList<>());
             imagesByDiscriminator.get(key).add(image);
         }
         return imagesByDiscriminator.entrySet().stream();
     }
 
-    private static Predicate<Entry<BucketKey, Collection<Image>>> atLeastOnePotentialCollision() {
+    private static Predicate<Entry<Discriminator, Collection<Image>>> atLeastOnePotentialCollision() {
         return entry -> entry.getValue().size() > 1;
     }
 
-    private Consumer<Entry<BucketKey, Integer>> printBucket() {
+    private Consumer<Entry<Discriminator, Integer>> printBucket() {
         return entry -> {
             var stringBuilder = new StringBuilder();
             logger.fine(() -> stringBuilder
@@ -110,7 +110,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
         };
     }
 
-    private static StringBuilder printPotentialCollision(StringBuilder stringBuilder, Entry<BucketKey, ?> entry) {
+    private static StringBuilder printPotentialCollision(StringBuilder stringBuilder, Entry<Discriminator, ?> entry) {
         return stringBuilder
                 .append(entry.getValue())
                 .append(": ")
@@ -118,9 +118,9 @@ public class ExifImageProcessor extends BruteForceProcessor {
     }
 
     private static Collector<
-            Entry<BucketKey, Collection<Image>>,
+            Entry<Discriminator, Collection<Image>>,
             ?,
-            Map<BucketKey, PotentialCollision>
+            Map<Discriminator, PotentialCollision>
     > toPotentialCollision() {
         return Collectors.toMap(
                 Entry::getKey,
@@ -145,13 +145,13 @@ public class ExifImageProcessor extends BruteForceProcessor {
         }
     }
 
-    private static class BucketKey {
+    private static class Discriminator {
 
         private final String value;
         private final Dimension dimension;
 
 
-        private BucketKey(Image image) {
+        private Discriminator(Image image) {
             this.dimension = image.dimension();
             this.value = image.dimension() + "-" + image.format() + " " + image.weight();
         }
@@ -163,8 +163,8 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof BucketKey bucketKey)) return false;
-            return Objects.equals(value, bucketKey.value);
+            if (!(o instanceof Discriminator discriminator)) return false;
+            return Objects.equals(value, discriminator.value);
         }
 
         @Override
