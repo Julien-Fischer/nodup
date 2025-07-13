@@ -69,7 +69,7 @@ public class ImageDeduplicator {
             Path sourcePath = collision.a().path();
             Path targetPath = bin.path().resolve(sourcePath.getFileName());
             performAction(sourcePath, targetPath);
-            logger.fine("File moved to: " + targetPath);
+            logger.fine(() -> "File moved to: " + targetPath);
         }
     }
 
