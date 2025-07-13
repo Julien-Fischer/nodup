@@ -16,12 +16,14 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Arrays.stream;
 
 public class App {
 
@@ -64,21 +66,28 @@ public class App {
     }
 
     private static void parseArguments(String[] arguments) {
-        Level logLevel = null;
+        processLogLevel(arguments);
+
         for (String argument : arguments) {
             action = readAction(argument);
+        }
+    }
 
-            if (argument.startsWith("--log=")) {
-                String levelString = argument.substring("--log=".length());
-                if (logLevel == null) {
-                    try {
-                        logLevel = readLogLevel(levelString);
-                        setLogLevel(logLevel);
-                    } catch (IllegalArgumentException exception) {
-                        logger.severe(exception.getMessage());
-                    }
-                }
-            }
+    private static void processLogLevel(String[] arguments) {
+        stream(arguments)
+                .filter(argument -> argument.startsWith("--log="))
+                .findFirst()
+                .flatMap(App::parseLogLevel)
+                .ifPresent(App::setLogLevel);
+    }
+
+    private static Optional<Level> parseLogLevel(String argument) {
+        String levelString = argument.substring("--log=".length());
+        try {
+            return Optional.of(readLogLevel(levelString));
+        } catch (IllegalArgumentException exception) {
+            logger.severe(exception.getMessage());
+            return Optional.empty();
         }
     }
 
