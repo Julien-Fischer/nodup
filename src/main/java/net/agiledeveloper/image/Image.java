@@ -34,4 +34,17 @@ public interface Image {
         }
     }
 
+
+    class ReadException extends RuntimeException {
+
+        public ReadException(String message) {
+            super(message);
+        }
+
+        public ReadException(Exception cause) {
+            super(cause);
+        }
+
+    }
+
 }

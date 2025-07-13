@@ -82,7 +82,7 @@ public class IOImage implements Image {
         try (ImageInputStream in = ImageIO.createImageInputStream(file)) {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(in);
             if (!readers.hasNext()) {
-                throw new RuntimeException("No suitable ImageReader found for " + file);
+                throw new Image.ReadException("No suitable ImageReader found for " + file);
             }
             ImageReader reader = readers.next();
             reader.setInput(in);
@@ -92,7 +92,7 @@ public class IOImage implements Image {
             dimension = new Dimension(width, height);
             reader.dispose();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new Image.ReadException(e);
         }
     }
 

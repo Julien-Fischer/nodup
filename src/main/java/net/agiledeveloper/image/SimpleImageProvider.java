@@ -16,7 +16,7 @@ public class SimpleImageProvider implements ImageProvider {
                     .map(IOImage::new)
                     .toArray(Image[]::new);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new Image.ReadException(e);
         }
     }
 

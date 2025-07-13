@@ -83,12 +83,16 @@ public class ExifProcessor extends BruteForceProcessor {
         return super.detectCollisions(potentialCollision.images()).stream();
     }
 
-    private static Stream<Entry<Discriminator, Collection<Image>>> groupByDiscriminator(Collection<Image> images) {
+    private Stream<Entry<Discriminator, Collection<Image>>> groupByDiscriminator(Collection<Image> images) {
         var imagesByDiscriminator = new HashMap<Discriminator, Collection<Image>>();
         for (Image image : images) {
-            var key = new Discriminator(image);
-            imagesByDiscriminator.putIfAbsent(key, new ArrayList<>());
-            imagesByDiscriminator.get(key).add(image);
+            try {
+                var key = new Discriminator(image);
+                imagesByDiscriminator.putIfAbsent(key, new ArrayList<>());
+                imagesByDiscriminator.get(key).add(image);
+            } catch (Image.ReadException exception) {
+                logger.info("Ignoring %s: not an image file".formatted(image.path()));
+            }
         }
         return imagesByDiscriminator.entrySet().stream();
     }
