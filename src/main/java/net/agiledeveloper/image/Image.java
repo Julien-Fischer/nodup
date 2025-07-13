@@ -19,10 +19,7 @@ public interface Image {
     int[] pixels() throws IOException;
 
     default boolean hasSize(Image other) {
-        return (
-                width() == other.width() &&
-                height() == other.height()
-        );
+        return other.dimension().equals(dimension());
     }
 
 
