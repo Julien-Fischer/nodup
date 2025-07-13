@@ -1,25 +1,20 @@
 package net.agiledeveloper.image.processors.collision;
 
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 public class HashCollisionDetector implements CollisionDetector {
 
     @Override
-    public Optional<Collision> of(Image imageA, Image imageB) {
+    public boolean collides(Image imageA, Image imageB) {
         Hash a = hashPixels(imageA);
         Hash b = hashPixels(imageB);
-        if (!a.equals(b)) {
-            return Optional.empty();
-        }
-        return Optional.of(new Collision(imageA, imageB));
+        return a.equals(b);
     }
 
     private static Hash hashPixels(Image image) {

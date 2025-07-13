@@ -37,12 +37,10 @@ public class BruteForceProcessor implements ImageProcessor {
             if (read.contains(image)) continue;
             for (var other : images) {
                 logger.log(FINEST, () -> "    " + other);
-                if (!image.hasSize(other)) continue;
-                if (read.contains(other) || image == other) continue;
-                Optional<Collision> potentialCollision = collisionDetector.of(image, other);
-                if (potentialCollision.isPresent()) {
+                if (!image.hasSize(other) || read.contains(other) || image == other) continue;
+                if (collisionDetector.collides(image, other)) {
                     read.add(other);
-                    results.add(potentialCollision.get());
+                    results.add(new Collision(image, other));
                 }
             }
             i++;
