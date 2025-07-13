@@ -35,7 +35,7 @@ public class App {
     public static final Level LOG_LEVEL = Level.INFO;
     private static final Collider COLLIDER = Collider.PIXEL;
     private static final Processor PROCESSOR = Processor.EXIF;
-    private static final Action ACTION = Action.MOVE;
+    private static final Action ACTION = Action.COPY;
     public static final String COLLISION_BIN_NAME = "collision_bin";
 
     private static final Logger logger = Logger.getLogger(App.class.getSimpleName());
@@ -81,8 +81,16 @@ public class App {
             var firstPath = collision.a().path();
             Path sourcePath = firstPath;
             Path targetPath = bin.toPath().resolve(sourcePath.getFileName());
-            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            action(sourcePath, targetPath);
             logger.fine("File moved to: " + targetPath);
+        }
+    }
+
+    private static void action(Path sourcePath, Path targetPath) throws IOException {
+        switch (ACTION) {
+            case MOVE -> Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            case COPY -> Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            default -> throw new IllegalArgumentException("Unsupported action: " + ACTION);
         }
     }
 
@@ -178,6 +186,7 @@ public class App {
     private enum Action {
 
         SCAN,
+        COPY,
         MOVE
 
     }
