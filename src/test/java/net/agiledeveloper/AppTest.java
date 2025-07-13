@@ -72,18 +72,17 @@ class AppTest {
     void without_parameters_fails() throws IOException {
         havingDirectoryNamed("directory");
 
-
         whenStartingApp()
                 .withoutAnyParameter();
 
-        assertThatLogContains(System.getProperty("user.dir"));
+        expectLog()
+                .toContain(System.getProperty("user.dir"));
     }
 
     @Test
     void with_no_images() throws IOException {
         havingDirectoryNamed("directory")
                 .empty();
-
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString());
@@ -95,7 +94,6 @@ class AppTest {
     void with_images_but_no_collision() throws IOException {
         havingDirectoryNamed("directory")
                 .containing(aBigDog(), aDog(), aCat());
-
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString());
@@ -110,7 +108,6 @@ class AppTest {
         var b = aDogImage().named("dog-b").build();
         havingDirectoryNamed("directory")
                 .containing(aBigDog(), a, b, aCat());
-
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString());
@@ -127,7 +124,6 @@ class AppTest {
         givenThat(directoryToScan)
                 .contains(aBigDog(), a, b, aCat());
 
-
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--move");
 
@@ -143,7 +139,6 @@ class AppTest {
         givenThat(directoryToScan)
                 .contains(aBigDog(), a, b, aCat());
 
-
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--copy");
 
@@ -158,7 +153,8 @@ class AppTest {
         whenStartingApp()
                 .withParameters(directoryToScan.toString());
 
-        assertThatLogContains("Log level: INFO");
+        expectLog()
+                .toContain("Log level: INFO");
     }
 
     @Test
@@ -168,7 +164,8 @@ class AppTest {
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--log=fine");
 
-        assertThatLogContains("Log level: FINE");
+        expectLog()
+                .toContain("Log level: FINE");
     }
 
     @Test
@@ -178,8 +175,9 @@ class AppTest {
         whenStartingApp()
                 .withParameters("--log=fine");
 
-        assertThatLogContains(System.getProperty("user.dir"));
-        assertThatLogContains("Log level: FINE");
+        expectLog()
+                .toContain(System.getProperty("user.dir"))
+                .toContain("Log level: FINE");
     }
 
 
@@ -214,7 +212,8 @@ class AppTest {
     }
 
     private void assertThatFilesWereFound(int count) {
-        assertThatLogContains("Found %s images in %s".formatted(count, this.directoryToScan));
+        expectLog()
+                .toContain("Found %s images in %s".formatted(count, this.directoryToScan));
     }
 
     private void assertThatNoFilesWereFound() {
@@ -222,7 +221,7 @@ class AppTest {
     }
 
     private void assertThatNoDuplicatesWereFound() {
-        assertThatLogContains("Found 0 collisions");
+        expectLog().toContain("Found 0 collisions");
     }
 
     private void assertThatStdoutContains(String expected) {
@@ -233,12 +232,21 @@ class AppTest {
         }
     }
 
-    private void assertThatLogContains(String expected) {
-        try {
-            assertThat(handler.getMessages()).contains(expected);
-        } finally {
-            System.setOut(originalOut);
+    private LogAssertion expectLog() {
+        return new LogAssertion(handler, originalOut);
+    }
+
+    private record LogAssertion(TestHandler handler, PrintStream originalOut) {
+
+        public LogAssertion toContain(String expected) {
+            try {
+                assertThat(handler.getMessages()).contains(expected);
+            } finally {
+                System.setOut(originalOut);
+            }
+            return this;
         }
+
     }
 
     private void mockLogger() {
@@ -306,34 +314,39 @@ class AppTest {
     }
 
     private CopyAssertion assertThatDuplicatesWereCopied(int count) {
-        assertThatLogContains("About to [COPY] %d duplicates to %s".formatted(count, bin.path()));
+        expectLog()
+                .toContain("About to [COPY] %d duplicates to %s".formatted(count, bin.path()));
         return new CopyAssertion();
     }
 
     private class CopyAssertion {
 
         public void forImages(Image... images) {
-            assertThatLogContains("Done [COPY] %s duplicates to %s".formatted(images.length, bin.path()));
+            expectLog()
+                    .toContain("Done [COPY] %s duplicates to %s".formatted(images.length, bin.path()));
         }
 
     }
 
     private MoveAssertion assertThatDuplicatesWereMoved(int count) {
-        assertThatLogContains("About to [MOVE] %d duplicates to %s".formatted(count, bin.path()));
+        expectLog()
+                .toContain("About to [MOVE] %d duplicates to %s".formatted(count, bin.path()));
         return new MoveAssertion();
     }
 
     private class MoveAssertion {
 
         public void forImages(Image... images) {
-            assertThatLogContains("Done [MOVE] %s duplicates to %s".formatted(images.length, bin.path()));
+            expectLog()
+                    .toContain("Done [MOVE] %s duplicates to %s".formatted(images.length, bin.path()));
         }
 
     }
 
 
     private DuplicateAssertion assertThatDuplicatesWereFound(int count) {
-        assertThatLogContains("Found %d collisions".formatted(count));
+        expectLog()
+                .toContain("Found %d collisions".formatted(count));
         return new DuplicateAssertion();
     }
 
@@ -342,8 +355,9 @@ class AppTest {
         public void forImages(Image a, Image b) {
             var aName = a.path().getFileName().toString();
             var bName = b.path().getFileName().toString();
-            assertThatLogContains("Collision %s".formatted(aName));
-            assertThatLogContains("vs %s".formatted(bName));
+            expectLog()
+                    .toContain("Collision %s".formatted(aName))
+                    .toContain("vs %s".formatted(bName));
         }
 
     }
