@@ -153,7 +153,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
         private Discriminator(Image image) {
             this.dimension = image.dimension();
-            this.value = image.dimension() + "-" + image.format() + " " + image.weight();
+            this.value = discriminateFields(image);
         }
 
 
@@ -175,6 +175,10 @@ public class ExifImageProcessor extends BruteForceProcessor {
         @Override
         public String toString() {
             return value;
+        }
+
+        private static String discriminateFields(Image image) {
+            return image.dimension() + "-" + image.format() + " " + image.weight();
         }
     }
 
