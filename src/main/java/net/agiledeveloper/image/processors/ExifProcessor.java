@@ -15,9 +15,9 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
-public class ExifImageProcessor extends BruteForceProcessor {
+public class ExifProcessor extends BruteForceProcessor {
 
-    public ExifImageProcessor(CollisionDetector collisionDetector) {
+    public ExifProcessor(CollisionDetector collisionDetector) {
         super(collisionDetector);
     }
 

@@ -6,7 +6,7 @@ import net.agiledeveloper.image.collision.CollisionDetector;
 import net.agiledeveloper.image.collision.HashCollisionDetector;
 import net.agiledeveloper.image.collision.PixelCollisionDetector;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
-import net.agiledeveloper.image.processors.ExifImageProcessor;
+import net.agiledeveloper.image.processors.ExifProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 
@@ -130,7 +130,7 @@ public class App {
 
     private enum Processor {
 
-        EXIF (new ExifImageProcessor(collider.algorithm)),
+        EXIF (new ExifProcessor(collider.algorithm)),
         BRUTE_FORCE (new BruteForceProcessor(collider.algorithm));
 
         private final ImageProcessor algorithm;

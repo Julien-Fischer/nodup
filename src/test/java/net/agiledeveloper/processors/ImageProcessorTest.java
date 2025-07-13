@@ -1,4 +1,4 @@
-package net.agiledeveloper;
+package net.agiledeveloper.processors;
 
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.processors.ImageProcessor;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 import java.util.Optional;
 
-import static net.agiledeveloper.ImageProcessorTest.ImageBuilder.*;
+import static net.agiledeveloper.processors.ImageProcessorTest.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 

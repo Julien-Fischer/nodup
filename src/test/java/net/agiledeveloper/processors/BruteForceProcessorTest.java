@@ -1,4 +1,4 @@
-package net.agiledeveloper;
+package net.agiledeveloper.processors;
 
 import net.agiledeveloper.image.collision.CollisionDetector;
 import net.agiledeveloper.image.collision.HashCollisionDetector;
