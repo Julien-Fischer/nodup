@@ -24,7 +24,8 @@ import java.util.logging.Logger;
 
 import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
 
 class AppTest {
 
@@ -71,9 +72,9 @@ class AppTest {
     void without_parameters_fails() throws IOException {
         havingDirectoryNamed("directory");
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(this::startingAppWithoutParameters)
-                .withMessageContaining("Missing required arguments");
+        whenStartingAppWithoutParameters();
+
+        assertThatLogContains(System.getProperty("user.dir"));
     }
 
     @Test
@@ -156,8 +157,18 @@ class AppTest {
         assertThatLogContains("Log level: FINE");
     }
 
+    @Test
+    void it_uses_specified_log_level_when_no_positional_parameters() throws IOException {
+        havingDirectoryNamed("directory");
 
-    private void startingAppWithoutParameters() {
+        whenStartingAppWithParameters("--log=fine");
+
+        assertThatLogContains(System.getProperty("user.dir"));
+        assertThatLogContains("Log level: FINE");
+    }
+
+
+    private void whenStartingAppWithoutParameters() {
         whenStartingAppWithParameters();
     }
 

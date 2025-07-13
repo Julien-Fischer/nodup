@@ -40,15 +40,19 @@ public class App {
 
 
     public static void main(String[] args) {
-        requireValidArguments(args);
         parseArguments(args);
         setLogLevel(LOG_LEVEL);
 
-        var directory = args[0];
+        var directory = readDirectory(args);
         logConfig(directory);
 
         var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, bin);
         imageDeduplicator.execute(action, directory);
+    }
+
+    private static String readDirectory(String[] args) {
+        boolean isDefined = args.length > 0 && !args[0].startsWith("--");
+        return isDefined ? args[0] : System.getProperty("user.dir");
     }
 
     private static void logConfig(String directory) {
@@ -96,12 +100,6 @@ public class App {
             case "-s", "--scan" -> Action.SCAN;
             default -> DEFAULT_ACTION;
         };
-    }
-
-    private static void requireValidArguments(String[] args) {
-        if (args.length == 0) {
-            throw new IllegalArgumentException("Missing required arguments");
-        }
     }
 
     private static void setLogLevel(Level level) {

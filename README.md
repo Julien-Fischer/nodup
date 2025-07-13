@@ -32,7 +32,10 @@ Cross-platform image deduplicator with an emphasis on performance
 
 ```
 Usage:
-  nodup /path/to/dir [OPTIONS]
+  nodup [/path/to/dir] [OPTIONS]
+
+Positional parameters:
+  $1               (Optional) The path to the directory to process  
 
 Options:
   --log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).
