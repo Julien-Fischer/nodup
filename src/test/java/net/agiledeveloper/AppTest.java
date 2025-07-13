@@ -1,6 +1,7 @@
 package net.agiledeveloper;
 
 import net.agiledeveloper.image.Image;
+import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.bin.Bin;
 import org.junit.jupiter.api.AfterEach;
@@ -20,6 +21,7 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
@@ -36,16 +38,20 @@ class AppTest {
     public StubImageProvider imageProvider = new StubImageProvider();
     public StubBin bin = new StubBin(tempDir);
 
+    private final List<Class<?>> loggersToMock = List.of(
+            App.class,
+            ImageDeduplicator.class
+    );
+
 
     @BeforeEach
     void setUp() {
         mockStdout();
         mockLogger();
-        imageProvider.clear();
-        App.imageProvider = imageProvider;
-        bin = new StubBin(tempDir);
-        App.bin = bin;
+        mockImageProvider();
+        mockBin();
     }
+
 
     @AfterEach
     void tearDown() {
@@ -168,10 +174,12 @@ class AppTest {
     }
 
     private void mockLogger() {
-        var logger = Logger.getLogger(App.class.getSimpleName());
-        handler = new TestHandler();
-        logger.addHandler(handler);
-        logger.setUseParentHandlers(false);
+        loggersToMock.forEach(type -> {
+            var logger = Logger.getLogger(type.getSimpleName());
+            handler = new TestHandler();
+            logger.addHandler(handler);
+            logger.setUseParentHandlers(false);
+        });
     }
 
     private void mockStdout() {
@@ -179,14 +187,24 @@ class AppTest {
         System.setOut(new PrintStream(outputStream));
     }
 
+    private void mockBin() {
+        bin = new StubBin(tempDir);
+        App.bin = bin;
+    }
+
+    private void mockImageProvider() {
+        imageProvider.clear();
+        App.imageProvider = imageProvider;
+    }
+
 
     static class TestHandler extends Handler {
 
-        private String messages = "";
+        private final List<String> messages = new ArrayList<>();
 
         @Override
-        public void publish(LogRecord record) {
-            messages += record.getMessage() + " | ";
+        public void publish(LogRecord logRecord) {
+            messages.add(logRecord.getMessage());
         }
 
         @Override
@@ -196,7 +214,7 @@ class AppTest {
         public void close() throws SecurityException {}
 
         public String getMessages() {
-            return messages;
+            return join(" | ", messages);
         }
     }
 
@@ -218,7 +236,7 @@ class AppTest {
         }
 
     }
-    
+
     private MoveAssertion assertThatDuplicatesWereMoved(int count) {
         assertThatLogContains("About to [MOVE] %d duplicates to %s".formatted(count, bin.path()));
         return new MoveAssertion();
@@ -269,7 +287,7 @@ class AppTest {
     }
 
     private record StubBin(Path parentDirectory) implements Bin {
-        
+
         @Override
         public Path path() {
             var rootBinDirectory = Paths.get("bin-directory");
