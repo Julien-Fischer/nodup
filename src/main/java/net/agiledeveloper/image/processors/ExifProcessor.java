@@ -1,5 +1,6 @@
 package net.agiledeveloper.image.processors;
 
+import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.Image.Dimension;
 import net.agiledeveloper.image.processors.collision.CollisionDetector;
@@ -33,6 +34,7 @@ public class ExifProcessor extends BruteForceProcessor {
 
 
     private List<Collision> findActualCollisions(Map<Discriminator, PotentialCollision> potentialCollisions) {
+        logger.setLevel(App.LOG_LEVEL);
         var total = countTotal(potentialCollisions);
         logSummary(total, potentialCollisions);
         logBuckets(toFrequencyMap(potentialCollisions));

@@ -26,7 +26,7 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 public class App {
 
     public static final Action DEFAULT_ACTION = Action.SCAN;
-    public static final Level LOG_LEVEL = Level.INFO;
+    public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
     private static final Collider COLLIDER = Collider.PIXEL;
     private static final Processor PROCESSOR = Processor.EXIF;
     public static final String COLLISION_BIN_NAME = "collision_bin";
@@ -35,6 +35,7 @@ public class App {
     public static ImageProvider imageProvider = new SimpleImageProvider();
     public static Bin bin = new DateBin();
     private static Action action = DEFAULT_ACTION;
+    public static Level LOG_LEVEL = DEFAULT_LOG_LEVEL;
 
 
     public static void main(String[] args) {
@@ -56,8 +57,32 @@ public class App {
 
 
     private static void parseArguments(String[] arguments) {
+        Level logLevel = null;
         for (String argument : arguments) {
             action = readAction(argument);
+
+            if (argument.startsWith("--log=")) {
+                String levelString = argument.substring("--log=".length());
+                if (logLevel == null) {
+                    try {
+                        logLevel = readLogLevel(levelString);
+                        setLogLevel(logLevel);
+                    } catch (IllegalArgumentException ex) {
+                        System.out.println(ex.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    public static Level readLogLevel(String levelName) {
+        if (levelName == null) {
+            throw new IllegalArgumentException("Level name cannot be null");
+        }
+        try {
+            return Level.parse(levelName.trim().toUpperCase());
+        } catch (IllegalArgumentException cause) {
+            throw new IllegalArgumentException("Unknown logging level: " + levelName, cause);
         }
     }
 
@@ -77,6 +102,7 @@ public class App {
     }
 
     private static void setLogLevel(Level level) {
+        LOG_LEVEL = level;
         logger.setLevel(level);
         for (var handler : Logger.getLogger("").getHandlers()) {
             handler.setFormatter(new MessageFormatter());

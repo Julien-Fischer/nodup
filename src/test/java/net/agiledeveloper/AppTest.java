@@ -4,6 +4,7 @@ import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.bin.Bin;
+import net.agiledeveloper.image.processors.BruteForceProcessor;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,8 @@ class AppTest {
 
     private final List<Class<?>> loggersToMock = List.of(
             App.class,
-            ImageDeduplicator.class
+            ImageDeduplicator.class,
+            BruteForceProcessor.class
     );
 
 
@@ -136,6 +138,24 @@ class AppTest {
                 .forImages(a);
     }
 
+    @Test
+    void it_uses_default_log_level() throws IOException {
+        havingDirectoryNamed("directory");
+
+        whenStartingAppWithParameters(directoryToScan.toString());
+
+        assertThatLogContains("Log level: INFO");
+    }
+
+    @Test
+    void it_uses_specified_log_level() throws IOException {
+        havingDirectoryNamed("directory");
+
+        whenStartingAppWithParameters(directoryToScan.toString(), "--log=fine");
+
+        assertThatLogContains("Log level: FINE");
+    }
+
 
     private void startingAppWithoutParameters() {
         whenStartingAppWithParameters();
@@ -188,9 +208,9 @@ class AppTest {
     }
 
     private void mockLogger() {
+        handler = new TestHandler();
         loggersToMock.forEach(type -> {
             var logger = Logger.getLogger(type.getSimpleName());
-            handler = new TestHandler();
             logger.addHandler(handler);
             logger.setUseParentHandlers(false);
         });
