@@ -14,7 +14,6 @@ public class BruteForceProcessor implements ImageProcessor {
 
     protected final Logger logger = Logger.getLogger(getClass().getSimpleName());
 
-
     private final CollisionDetector collisionDetector;
 
 

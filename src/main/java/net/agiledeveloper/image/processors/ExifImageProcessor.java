@@ -6,6 +6,7 @@ import net.agiledeveloper.image.collision.CollisionDetector;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
@@ -36,18 +37,19 @@ public class ExifImageProcessor extends BruteForceProcessor {
         logSummary(total, potentialCollisions);
         logBuckets(toFrequencyMap(potentialCollisions));
 
-        int i = 0;
-        List<Collision> collisions = new ArrayList<>();
-        for (var entry : potentialCollisions.entrySet()) {
-            var progress = printProgress(i, total, "Potential collision");
-            var stringBuilder = new StringBuilder();
-            logger.info(() -> "%s: %s".formatted(progress, printPotentialCollision(stringBuilder, entry)));
-            var found = findCollisions(entry.getValue());
-            collisions.addAll(found.toList());
-            i += entry.getValue().count;
-        }
-        return collisions;
+        var processedImages = new AtomicInteger(0);
+        return potentialCollisions.entrySet()
+                .parallelStream()
+                .flatMap(entry -> {
+                    int progressIndex = processedImages.getAndAdd(entry.getValue().count);
+                    var progress = printProgress(progressIndex, total, "Potential collision");
+                    var stringBuilder = new StringBuilder();
+                    logger.info(() -> "%s: %s".formatted(progress, printPotentialCollision(stringBuilder, entry)));
+                    return findCollisions(entry.getValue());
+                })
+                .toList();
     }
+
 
     private int countTotal(Map<BucketKey, PotentialCollision> potentialCollisions) {
         return potentialCollisions.values().stream()
