@@ -49,7 +49,7 @@ class AppTest {
 
 
     @Test
-    void name() {
+    void it_throws_no_exception() {
         assertThatNoException()
                 .isThrownBy(App::new);
     }
