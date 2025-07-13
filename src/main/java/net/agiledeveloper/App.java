@@ -42,19 +42,21 @@ public class App {
         requireValidArguments(args);
         parseArguments(args);
         setLogLevel(LOG_LEVEL);
+
         var directory = args[0];
+        logConfig(directory);
 
         var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, bin);
+        imageDeduplicator.execute(action, directory);
+    }
 
+    private static void logConfig(String directory) {
         logger.info(() -> "%s duplicates in %s".formatted(action, directory));
         logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
         logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
         logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
         logger.info(() -> "Bin: %s".formatted(bin.path()));
-
-        imageDeduplicator.execute(action, directory);
     }
-
 
     private static void parseArguments(String[] arguments) {
         Level logLevel = null;
