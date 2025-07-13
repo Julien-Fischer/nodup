@@ -74,8 +74,8 @@ public class App {
                     try {
                         logLevel = readLogLevel(levelString);
                         setLogLevel(logLevel);
-                    } catch (IllegalArgumentException ex) {
-                        System.out.println(ex.getMessage());
+                    } catch (IllegalArgumentException exception) {
+                        logger.severe(exception.getMessage());
                     }
                 }
             }
