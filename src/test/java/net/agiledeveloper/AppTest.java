@@ -100,7 +100,7 @@ class AppTest {
     private FilePrecondition havingDirectoryNamed(String directory) throws IOException {
         this.directory = tempDir.resolve(directory);
         Files.createDirectory(this.directory);
-        return new FilePrecondition();
+        return new FilePrecondition(this.directory);
     }
 
     private void assertThatNoFilesWereFound() {
@@ -161,14 +161,16 @@ class AppTest {
         }
     }
 
-    static class FilePrecondition {
+    private record FilePrecondition(Path directory) {
 
-        public void empty() {
+        public void empty() { }
 
-        }
-
-        public void containing(Image... images) {
-
+        public void containing(Image... images) throws IOException {
+            for (var image : images) {
+                Path fileToCreate = directory.resolve(image.path());
+                Files.createDirectories(fileToCreate.getParent());
+                Files.createFile(fileToCreate);
+            }
         }
 
     }

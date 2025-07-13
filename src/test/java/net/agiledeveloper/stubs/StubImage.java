@@ -9,7 +9,7 @@ public record StubImage(String name, Pixels pixelContent, String format, long we
 
     @Override
     public Path path() {
-        return Paths.get("/fake/path/for/stubbing");
+        return Paths.get("stub/" + name);
     }
 
     @Override
