@@ -33,21 +33,21 @@ import static java.time.format.DateTimeFormatter.ofPattern;
 public class App {
 
     public static final Level LOG_LEVEL = Level.INFO;
-    private static final Collider collider = Collider.PIXEL;
-    private static final Processor processor = Processor.EXIF;
+    private static final Collider COLLIDER = Collider.PIXEL;
+    private static final Processor PROCESSOR = Processor.EXIF;
     private static final Action ACTION = Action.MOVE;
+    public static final String COLLISION_BIN_NAME = "collision_bin";
 
     private static final Logger logger = Logger.getLogger(App.class.getSimpleName());
-    public static final String COLLISION_BIN_NAME = "collision_bin";
 
 
     public static void main(String[] args) {
         requireValidArguments(args);
         setLogLevel(LOG_LEVEL);
 
-        ImageProcessor imageProcessor = processor.algorithm;
-        logger.info(() -> "Image processor: %s".formatted(processor));
-        logger.info(() -> "Collision algorithm: %s".formatted(collider));
+        ImageProcessor imageProcessor = PROCESSOR.algorithm;
+        logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
+        logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
 
         long start = System.nanoTime();
 
@@ -164,8 +164,8 @@ public class App {
 
     private enum Processor {
 
-        EXIF (new ExifProcessor(collider.algorithm)),
-        BRUTE_FORCE (new BruteForceProcessor(collider.algorithm));
+        EXIF (new ExifProcessor(COLLIDER.algorithm)),
+        BRUTE_FORCE (new BruteForceProcessor(COLLIDER.algorithm));
 
         private final ImageProcessor algorithm;
 
