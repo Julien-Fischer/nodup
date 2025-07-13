@@ -1,9 +1,9 @@
 package net.agiledeveloper;
 
 import net.agiledeveloper.image.Image;
+import net.agiledeveloper.image.ImageProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -29,11 +31,15 @@ class AppTest {
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outputStream;
 
+    public StubImageProvider imageProvider = new StubImageProvider();
+
 
     @BeforeEach
     void setUp() {
         mockStdout();
         mockLogger();
+        imageProvider.clear();
+        App.imageProvider = imageProvider;
     }
 
     @AfterEach
@@ -74,18 +80,20 @@ class AppTest {
 
         whenStartingAppWithParameters(directory.toString());
 
-        assertThatNoFilesWereFound();
+        assertThatFilesWereFound(3);
+        assertThatNoDuplicatesWereFound();
     }
 
-    @Disabled("implement")
     @Test
     void with_collisions() throws IOException {
+        var a = aDogImage().named("dog-a").build();
+        var b = aDogImage().named("dog-b").build();
         havingDirectoryNamed("directory")
-                .containing(aBigDog(), aDog(), aDog(), aCat());
+                .containing(aBigDog(), a, b, aCat());
 
         whenStartingAppWithParameters(directory.toString());
 
-        assertThatFilesWereFound(aDog());
+        assertThatDuplicatesWereFound(aDog());
     }
 
 
@@ -100,14 +108,22 @@ class AppTest {
     private FilePrecondition havingDirectoryNamed(String directory) throws IOException {
         this.directory = tempDir.resolve(directory);
         Files.createDirectory(this.directory);
-        return new FilePrecondition(this.directory);
+        return new FilePrecondition(imageProvider, this.directory);
+    }
+
+    private void assertThatFilesWereFound(int count) {
+        assertThatLogContains("Found %s images in %s".formatted(count, this.directory));
     }
 
     private void assertThatNoFilesWereFound() {
+        assertThatFilesWereFound(0);
+    }
+
+    private void assertThatNoDuplicatesWereFound() {
         assertThatLogContains("Found 0 collisions");
     }
 
-    private void assertThatFilesWereFound(Image... images) {
+    private void assertThatDuplicatesWereFound(Image... images) {
         assertThatLogContains("Found %s collisions".formatted(images.length));
         // TODO: assert that contains image names
     }
@@ -161,16 +177,36 @@ class AppTest {
         }
     }
 
-    private record FilePrecondition(Path directory) {
+    private record FilePrecondition(StubImageProvider imageProvider, Path directory) {
 
-        public void empty() { }
+        public void empty() {}
 
         public void containing(Image... images) throws IOException {
             for (var image : images) {
+                imageProvider.addImage(image);
                 Path fileToCreate = directory.resolve(image.path());
                 Files.createDirectories(fileToCreate.getParent());
                 Files.createFile(fileToCreate);
             }
+        }
+
+    }
+
+    private static class StubImageProvider implements ImageProvider {
+
+        private final List<Image> images = new ArrayList<>();
+
+        public void addImage(Image image) {
+            images.add(image);
+        }
+
+        public void clear() {
+            images.clear();
+        }
+
+        @Override
+        public Image[] imagesAt(String directory) {
+            return images.toArray(new Image[0]);
         }
 
     }

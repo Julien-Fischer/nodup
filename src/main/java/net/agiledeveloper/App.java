@@ -1,7 +1,8 @@
 package net.agiledeveloper;
 
-import net.agiledeveloper.image.IOImage;
 import net.agiledeveloper.image.Image;
+import net.agiledeveloper.image.ImageProvider;
+import net.agiledeveloper.image.SimpleImageProvider;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
@@ -14,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.List;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -37,6 +36,7 @@ public class App {
     private static final Processor PROCESSOR = Processor.EXIF;
     private static final Action ACTION = Action.COPY;
     public static final String COLLISION_BIN_NAME = "collision_bin";
+    public static ImageProvider imageProvider = new SimpleImageProvider();
 
     private static final Logger logger = Logger.getLogger(App.class.getSimpleName());
 
@@ -52,7 +52,8 @@ public class App {
         long start = System.nanoTime();
 
         String directory = args[0];
-        Image[] images = at(directory);
+        Image[] images = imageProvider.imagesAt(directory);
+        logger.info("Found %s images in %s".formatted(images.length, directory));
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
         logger.info(() -> "#".repeat(80));
         logger.info(() -> "Found %s collisions:".formatted(collisions.size()));
@@ -107,25 +108,6 @@ public class App {
     private static void requireValidArguments(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("Missing required arguments");
-        }
-    }
-
-    private static Image[] at(String directory) {
-        Path dir = Paths.get(directory);
-        try {
-            return getFilesOnly(dir).stream()
-                    .map(IOImage::new)
-                    .toArray(Image[]::new);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static List<Path> getFilesOnly(Path directory) throws IOException {
-        try (var stream = Files.list(directory)) {
-            return stream
-                    .filter(Files::isRegularFile)
-                    .toList();
         }
     }
 
