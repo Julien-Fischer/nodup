@@ -1,10 +1,9 @@
-package net.agiledeveloper.processors;
+package net.agiledeveloper.image.processors;
 
-import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.collision.CollisionDetector;
 import net.agiledeveloper.image.processors.collision.HashCollisionDetector;
 
-class BruteForceProcessorTest extends ImageProcessorTest {
+public class BruteForceProcessorTest extends ImageProcessorTest {
 
     private static final CollisionDetector collisionDetector = new HashCollisionDetector();
 

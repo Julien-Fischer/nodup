@@ -1,7 +1,6 @@
-package net.agiledeveloper.processors;
+package net.agiledeveloper.image.processors;
 
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +11,7 @@ import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-abstract class ImageProcessorTest {
+public abstract class ImageProcessorTest {
 
     protected final ImageProcessor processor;
 
