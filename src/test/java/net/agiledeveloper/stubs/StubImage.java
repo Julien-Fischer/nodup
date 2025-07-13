@@ -5,11 +5,15 @@ import net.agiledeveloper.image.Image;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public record StubImage(String name, Pixels pixelContent, String format, long weight) implements Image {
+public record StubImage(Path path, String name, Pixels pixelContent, String format, long weight) implements Image {
+
+    public StubImage(String name, Pixels pixelContent, String format, long weight) {
+        this(Paths.get(name), name, pixelContent, format, weight);
+    }
 
     @Override
     public Path path() {
-        return Paths.get(name);
+        return path.resolve(name);
     }
 
     @Override
@@ -58,6 +62,7 @@ public record StubImage(String name, Pixels pixelContent, String format, long we
         private String format = "jpg";
         private Pixels pixels = Pixels.CAT;
         private Integer megaOctets = 10;
+        private Path path = Paths.get(name);
 
         public ImageBuilder named(String name) {
             this.name = name;
@@ -79,8 +84,13 @@ public record StubImage(String name, Pixels pixelContent, String format, long we
             return this;
         }
 
+        public ImageBuilder located(Path path) {
+            this.path = path;
+            return this;
+        }
+
         public Image build() {
-            return new StubImage(name, pixels, format, megaOctets);
+            return new StubImage(path, name, pixels, format, megaOctets);
         }
 
 

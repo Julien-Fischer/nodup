@@ -2,6 +2,7 @@ package net.agiledeveloper;
 
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.ImageProvider;
+import net.agiledeveloper.image.bin.Bin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -25,13 +27,14 @@ class AppTest {
 
     @TempDir
     private Path tempDir;
-    private Path directory;
+    private Path directoryToScan;
 
     private TestHandler handler;
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outputStream;
 
     public StubImageProvider imageProvider = new StubImageProvider();
+    public StubBin bin = new StubBin(tempDir);
 
 
     @BeforeEach
@@ -40,6 +43,8 @@ class AppTest {
         mockLogger();
         imageProvider.clear();
         App.imageProvider = imageProvider;
+        bin = new StubBin(tempDir);
+        App.bin = bin;
     }
 
     @AfterEach
@@ -68,7 +73,7 @@ class AppTest {
         havingDirectoryNamed("directory")
                 .empty();
 
-        whenStartingAppWithParameters(directory.toString());
+        whenStartingAppWithParameters(directoryToScan.toString());
 
         assertThatNoFilesWereFound();
     }
@@ -78,7 +83,7 @@ class AppTest {
         havingDirectoryNamed("directory")
                 .containing(aBigDog(), aDog(), aCat());
 
-        whenStartingAppWithParameters(directory.toString());
+        whenStartingAppWithParameters(directoryToScan.toString());
 
         assertThatFilesWereFound(3);
         assertThatNoDuplicatesWereFound();
@@ -91,10 +96,24 @@ class AppTest {
         havingDirectoryNamed("directory")
                 .containing(aBigDog(), a, b, aCat());
 
-        whenStartingAppWithParameters(directory.toString());
+        whenStartingAppWithParameters(directoryToScan.toString());
 
         assertThatDuplicatesWereFound(1)
                 .forImages(a, b);
+    }
+
+    @Test
+    void duplicates_are_moved_to_bin() throws IOException {
+        havingDirectoryToScan("directory");
+        var a = aDogImage().located(directoryToScan).named("dog-a").build();
+        var b = aDogImage().located(directoryToScan).named("dog-b").build();
+        givenThat(directoryToScan)
+                .contains(aBigDog(), a, b, aCat());
+
+        whenStartingAppWithParameters(directoryToScan.toString(), "--move");
+
+        assertThatDuplicatesWereMoved(1)
+                .forImages(a);
     }
 
 
@@ -106,14 +125,22 @@ class AppTest {
         App.main(parameters);
     }
 
+    private FilePrecondition givenThat(Path directory) {
+        return new FilePrecondition(imageProvider, directory);
+    }
+
     private FilePrecondition havingDirectoryNamed(String directory) throws IOException {
-        this.directory = tempDir.resolve(directory);
-        Files.createDirectory(this.directory);
-        return new FilePrecondition(imageProvider, this.directory);
+        havingDirectoryToScan(directory);
+        return new FilePrecondition(imageProvider, this.directoryToScan);
+    }
+
+    private void havingDirectoryToScan(String directory) throws IOException {
+        this.directoryToScan = tempDir.resolve(directory);
+        Files.createDirectory(this.directoryToScan);
     }
 
     private void assertThatFilesWereFound(int count) {
-        assertThatLogContains("Found %s images in %s".formatted(count, this.directory));
+        assertThatLogContains("Found %s images in %s".formatted(count, this.directoryToScan));
     }
 
     private void assertThatNoFilesWereFound() {
@@ -177,6 +204,10 @@ class AppTest {
 
         public void empty() {}
 
+        public void contains(Image... images) throws IOException {
+            containing(images);
+        }
+
         public void containing(Image... images) throws IOException {
             for (var image : images) {
                 imageProvider.addImage(image);
@@ -187,6 +218,20 @@ class AppTest {
         }
 
     }
+    
+    private MoveAssertion assertThatDuplicatesWereMoved(int count) {
+        assertThatLogContains("About to [MOVE] %d duplicates to %s".formatted(count, bin.path()));
+        return new MoveAssertion();
+    }
+
+    private class MoveAssertion {
+
+        public void forImages(Image... images) {
+            assertThatLogContains("Done [MOVE] %s duplicates to %s".formatted(images.length, bin.path()));
+        }
+
+    }
+
 
     private DuplicateAssertion assertThatDuplicatesWereFound(int count) {
         assertThatLogContains("Found %d collisions".formatted(count));
@@ -219,6 +264,23 @@ class AppTest {
         @Override
         public Image[] imagesAt(String directory) {
             return images.toArray(new Image[0]);
+        }
+
+    }
+
+    private record StubBin(Path parentDirectory) implements Bin {
+        
+        @Override
+        public Path path() {
+            var rootBinDirectory = Paths.get("bin-directory");
+            Path currentBin = parentDirectory.resolve(rootBinDirectory);
+            try {
+                Files.createDirectories(currentBin.getParent());
+                Files.createDirectories(currentBin);
+            } catch (IOException cause) {
+                throw new Bin.InitializationException("Could not initialize bin: " + cause.getMessage());
+            }
+            return currentBin;
         }
 
     }
