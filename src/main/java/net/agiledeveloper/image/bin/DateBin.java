@@ -2,6 +2,7 @@ package net.agiledeveloper.image.bin;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,7 +12,7 @@ import static net.agiledeveloper.App.COLLISION_BIN_NAME;
 
 public class DateBin implements Bin {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd_HH-mm-ss");
 
     private Path directory;
 
@@ -35,9 +36,11 @@ public class DateBin implements Bin {
         if (!newDir.exists() && !newDir.mkdirs()) {
             throw new IOException("Failed to create directory: " + newDir.getAbsolutePath());
         }
-        return newDir
+        Path currentBin = newDir
                 .toPath()
                 .resolve(directoryName);
+        Files.createDirectories(currentBin);
+        return currentBin;
     }
 
 }

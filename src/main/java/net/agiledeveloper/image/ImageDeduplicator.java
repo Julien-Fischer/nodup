@@ -38,6 +38,7 @@ public class ImageDeduplicator {
 
         long start = System.nanoTime();
 
+        logger.info(() -> "#".repeat(80));
         Image[] images = imageProvider.imagesAt(directory);
         logger.info(() -> "Found %s images in %s".formatted(images.length, directory));
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
@@ -67,7 +68,6 @@ public class ImageDeduplicator {
         for (var collision : collisions) {
             Path sourcePath = collision.a().path();
             Path targetPath = bin.path().resolve(sourcePath.getFileName());
-            System.out.println('a');
             performAction(sourcePath, targetPath);
             logger.fine("File moved to: " + targetPath);
         }

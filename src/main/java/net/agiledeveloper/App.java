@@ -49,6 +49,7 @@ public class App {
         logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
         logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
         logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
+        logger.info(() -> "Bin: %s".formatted(bin.path()));
 
         imageDeduplicator.execute(action, directory);
     }

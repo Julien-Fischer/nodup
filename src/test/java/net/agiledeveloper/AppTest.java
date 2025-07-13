@@ -122,6 +122,20 @@ class AppTest {
                 .forImages(a);
     }
 
+    @Test
+    void duplicates_are_copied_to_bin() throws IOException {
+        havingDirectoryToScan("directory");
+        var a = aDogImage().located(directoryToScan).named("dog-a").build();
+        var b = aDogImage().located(directoryToScan).named("dog-b").build();
+        givenThat(directoryToScan)
+                .contains(aBigDog(), a, b, aCat());
+
+        whenStartingAppWithParameters(directoryToScan.toString(), "--copy");
+
+        assertThatDuplicatesWereCopied(1)
+                .forImages(a);
+    }
+
 
     private void startingAppWithoutParameters() {
         whenStartingAppWithParameters();
@@ -233,6 +247,19 @@ class AppTest {
                 Files.createDirectories(fileToCreate.getParent());
                 Files.createFile(fileToCreate);
             }
+        }
+
+    }
+
+    private CopyAssertion assertThatDuplicatesWereCopied(int count) {
+        assertThatLogContains("About to [COPY] %d duplicates to %s".formatted(count, bin.path()));
+        return new CopyAssertion();
+    }
+
+    private class CopyAssertion {
+
+        public void forImages(Image... images) {
+            assertThatLogContains("Done [COPY] %s duplicates to %s".formatted(images.length, bin.path()));
         }
 
     }
