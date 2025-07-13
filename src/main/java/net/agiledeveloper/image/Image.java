@@ -1,8 +1,11 @@
 package net.agiledeveloper.image;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public interface Image {
+
+    Path path();
 
     String format();
 

@@ -5,6 +5,8 @@ import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -161,6 +163,11 @@ abstract class ImageProcessorTest {
     }
 
     private record StubImage(String name, Pixels pixelContent, String format, long weight) implements Image {
+
+        @Override
+        public Path path() {
+            return Paths.get("/fake/path/for/stubbing");
+        }
 
         @Override
         public int[] pixels() {

@@ -61,6 +61,7 @@ public class IOImage implements Image {
         return pixels;
     }
 
+    @Override
     public Path path() {
         return path;
     }
