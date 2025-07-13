@@ -10,10 +10,12 @@ import net.agiledeveloper.image.processors.collision.CollisionDetector;
 import net.agiledeveloper.image.processors.collision.HashCollisionDetector;
 import net.agiledeveloper.image.processors.collision.PixelCollisionDetector;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -33,8 +35,10 @@ public class App {
     public static final Level LOG_LEVEL = Level.INFO;
     private static final Collider collider = Collider.PIXEL;
     private static final Processor processor = Processor.EXIF;
+    private static final Action ACTION = Action.MOVE;
 
     private static final Logger logger = Logger.getLogger(App.class.getSimpleName());
+    public static final String COLLISION_BIN_NAME = "collision_bin";
 
 
     public static void main(String[] args) {
@@ -56,9 +60,39 @@ public class App {
             logger.info(() -> "" + collision);
         }
 
+        if (ACTION == Action.MOVE) {
+            try {
+                logger.info(() -> "#".repeat(80));
+                logger.info(() -> "Moving %s duplicates to %s:".formatted(collisions.size(), COLLISION_BIN_NAME));
+                move(collisions);
+            } catch (IOException exception) {
+                logger.severe("Could not move duplicates. Cause: " + exception.getMessage());
+            }
+        }
+
         long end = System.nanoTime();
         var duration = Duration.ofNanos(end - start);
         logger.info(() -> "Elapsed time: %s ms".formatted(duration.toMillis()));
+    }
+
+    private static void move(Collection<Collision> collisions) throws IOException {
+        File bin = createBin();
+        for (var collision : collisions) {
+            var firstPath = collision.a().path();
+            Path sourcePath = firstPath;
+            Path targetPath = bin.toPath().resolve(sourcePath.getFileName());
+            Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            logger.fine("File moved to: " + targetPath);
+        }
+    }
+
+    private static File createBin() throws IOException {
+        String userHome = System.getProperty("user.home");
+        File newDir = new File(userHome, COLLISION_BIN_NAME);
+        if (!newDir.exists() && !newDir.mkdirs()) {
+            throw new IOException("Failed to create directory: " + newDir.getAbsolutePath());
+        }
+        return newDir;
     }
 
 
@@ -138,6 +172,13 @@ public class App {
         Processor(ImageProcessor algorithm) {
             this.algorithm = algorithm;
         }
+
+    }
+
+    private enum Action {
+
+        SCAN,
+        MOVE
 
     }
 
