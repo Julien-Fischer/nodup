@@ -46,4 +46,11 @@ Flags:
 
 ## Requirements
 
+  All platforms:
+
   - Java 21
+
+  For Linux, the current installation script requires:
+
+  - Bash
+  - Maven
