@@ -95,6 +95,7 @@ abstract class ImageProcessorTest {
         private String name = "an image";
         private String format = "jpg";
         private Pixels pixels = Pixels.CAT;
+        private Integer megaOctets = 10;
 
         public ImageBuilder named(String name) {
             this.name = name;
@@ -111,8 +112,13 @@ abstract class ImageProcessorTest {
             return this;
         }
 
+        public ImageBuilder weighting(int megaOctets) {
+            this.megaOctets = megaOctets;
+            return this;
+        }
+
         public Image build() {
-            return new StubImage(name, pixels, format);
+            return new StubImage(name, pixels, format, megaOctets);
         }
 
 
@@ -154,7 +160,7 @@ abstract class ImageProcessorTest {
 
     }
 
-    private record StubImage(String name, Pixels pixelContent, String format) implements Image {
+    private record StubImage(String name, Pixels pixelContent, String format, long weight) implements Image {
 
         @Override
         public int[] pixels() {

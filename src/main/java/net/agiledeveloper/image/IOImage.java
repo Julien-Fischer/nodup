@@ -14,12 +14,20 @@ public class IOImage implements Image {
     private int[] pixels;
     private Dimension dimension;
     private String format;
+    private Long weight;
 
 
     public IOImage(Path path) {
         this.path = path;
     }
 
+    @Override
+    public long weight() {
+        if (weight == null) {
+            weight = path.toFile().length();
+        }
+        return weight;
+    }
 
     @Override
     public String format() {

@@ -41,5 +41,14 @@ class ExifProcessorTest extends ImageProcessorTest {
         assertThat(collisions).isEmpty();
     }
 
+    @Test
+    void different_weights_do_not_collide() {
+        var light = aDogImage().weighting(2).build();
+        var lighter = aDogImage().weighting(1).build();
+
+        Collection<ImageProcessor.Collision> collisions = processor.detectCollisions(lighter, light);
+
+        assertThat(collisions).isEmpty();
+    }
 }
 

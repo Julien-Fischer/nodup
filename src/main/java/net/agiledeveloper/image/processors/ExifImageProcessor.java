@@ -153,7 +153,7 @@ public class ExifImageProcessor extends BruteForceProcessor {
 
         private BucketKey(Image image) {
             this.dimension = image.dimension();
-            this.value = image.dimension() + "-" + image.format();
+            this.value = image.dimension() + "-" + image.format() + " " + image.weight();
         }
 
 

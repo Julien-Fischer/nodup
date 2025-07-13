@@ -6,6 +6,8 @@ public interface Image {
 
     String format();
 
+    long weight();
+
     int width();
 
     int height();
