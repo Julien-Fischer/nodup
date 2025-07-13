@@ -93,7 +93,8 @@ class AppTest {
 
         whenStartingAppWithParameters(directory.toString());
 
-        assertThatDuplicatesWereFound(aDog());
+        assertThatDuplicatesWereFound(1)
+                .forImages(a, b);
     }
 
 
@@ -121,11 +122,6 @@ class AppTest {
 
     private void assertThatNoDuplicatesWereFound() {
         assertThatLogContains("Found 0 collisions");
-    }
-
-    private void assertThatDuplicatesWereFound(Image... images) {
-        assertThatLogContains("Found %s collisions".formatted(images.length));
-        // TODO: assert that contains image names
     }
 
     private void assertThatStdoutContains(String expected) {
@@ -159,11 +155,11 @@ class AppTest {
 
     static class TestHandler extends Handler {
 
-        private String messages;
+        private String messages = "";
 
         @Override
         public void publish(LogRecord record) {
-            messages += record.getMessage();
+            messages += record.getMessage() + " | ";
         }
 
         @Override
@@ -188,6 +184,22 @@ class AppTest {
                 Files.createDirectories(fileToCreate.getParent());
                 Files.createFile(fileToCreate);
             }
+        }
+
+    }
+
+    private DuplicateAssertion assertThatDuplicatesWereFound(int count) {
+        assertThatLogContains("Found %d collisions".formatted(count));
+        return new DuplicateAssertion();
+    }
+
+    private class DuplicateAssertion {
+
+        public void forImages(Image a, Image b) {
+            var aName = a.path().getFileName().toString();
+            var bName = b.path().getFileName().toString();
+            assertThatLogContains("Collision %s".formatted(aName));
+            assertThatLogContains("vs %s".formatted(bName));
         }
 
     }
