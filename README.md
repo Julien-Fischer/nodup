@@ -30,9 +30,18 @@ Cross-platform image deduplicator with an emphasis on performance
 
 ## API
 
-- `nodup /path/to/dir [-c, --copy]`
-- `nodup /path/to/dir [-m, --move]`
-- `nodup /path/to/dir [-s, --scan] (default)`
+```
+Usage:
+  nodup /path/to/dir [OPTIONS]
+
+Options:
+  --log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).
+
+Flags:
+  -c, --copy       Copy files in the directory.
+  -m, --move       Move files in the directory.
+  -s, --scan       Scan the directory and display file information.
+```
 
 
 ## Requirements
