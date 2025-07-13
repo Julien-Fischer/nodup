@@ -91,8 +91,8 @@ public class IOImage implements Image {
             format = reader.getFormatName();
             dimension = new Dimension(width, height);
             reader.dispose();
-        } catch (IOException e) {
-            throw new Image.ReadException(e);
+        } catch (IOException | IllegalArgumentException cause) {
+            throw new Image.ReadException(cause);
         }
     }
 
