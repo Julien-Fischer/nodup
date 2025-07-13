@@ -2,13 +2,13 @@ package net.agiledeveloper;
 
 import net.agiledeveloper.image.IOImage;
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.collision.CollisionDetector;
-import net.agiledeveloper.image.collision.HashCollisionDetector;
-import net.agiledeveloper.image.collision.PixelCollisionDetector;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
+import net.agiledeveloper.image.processors.collision.CollisionDetector;
+import net.agiledeveloper.image.processors.collision.HashCollisionDetector;
+import net.agiledeveloper.image.processors.collision.PixelCollisionDetector;
 
 import java.io.IOException;
 import java.nio.file.Files;

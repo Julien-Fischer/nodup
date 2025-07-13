@@ -1,4 +1,4 @@
-package net.agiledeveloper.image.collision;
+package net.agiledeveloper.image.processors.collision;
 
 import net.agiledeveloper.image.Image;
 

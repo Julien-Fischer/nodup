@@ -1,9 +1,9 @@
 package net.agiledeveloper.processors;
 
-import net.agiledeveloper.image.collision.CollisionDetector;
-import net.agiledeveloper.image.collision.HashCollisionDetector;
 import net.agiledeveloper.image.processors.ExifProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
+import net.agiledeveloper.image.processors.collision.CollisionDetector;
+import net.agiledeveloper.image.processors.collision.HashCollisionDetector;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;

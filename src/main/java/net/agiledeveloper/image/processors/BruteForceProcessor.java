@@ -2,7 +2,7 @@ package net.agiledeveloper.image.processors;
 
 import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.collision.CollisionDetector;
+import net.agiledeveloper.image.processors.collision.CollisionDetector;
 
 import java.util.*;
 import java.util.logging.Logger;
