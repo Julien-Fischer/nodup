@@ -115,9 +115,14 @@ Flags:
         try {
             return Optional.of(readLogLevel(levelString));
         } catch (IllegalArgumentException exception) {
-            logger.severe(exception.getMessage());
+            fail(exception);
             return Optional.empty();
         }
+    }
+
+    private static void fail(Exception exception) {
+        logger.severe(exception.getMessage());
+        printHelp();
     }
 
     public static Level readLogLevel(String levelName) {
