@@ -57,7 +57,8 @@ public class App {
 
     @SuppressWarnings("java:S106")
     private static void failAndExit(Exception exception) {
-        System.err.println(exception.getMessage());
+        System.err.println("E: " + exception.getMessage());
+        System.out.println();
         printHelp();
         System.exit(1);
     }
