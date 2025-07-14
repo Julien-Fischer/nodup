@@ -25,10 +25,9 @@ import java.util.logging.Logger;
 
 import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatNoException;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 
-class AppTest {
+class OrchestratorTest {
 
     @TempDir
     private Path tempDir;
@@ -43,6 +42,7 @@ class AppTest {
 
     private final List<Class<?>> loggersToMock = List.of(
             App.class,
+            Orchestrator.class,
             ImageDeduplicator.class,
             BruteForceProcessor.class
     );
@@ -66,7 +66,7 @@ class AppTest {
     @Test
     void it_throws_no_exception() {
         assertThatNoException()
-                .isThrownBy(App::new);
+                .isThrownBy(Orchestrator::new);
     }
 
     @Test
@@ -197,11 +197,9 @@ class AppTest {
 
     @Test
     void unknown_arguments_throw() {
-        whenStartingApp()
-                .withParameters("--unknown-argument");
-
-        expectStdout()
-                .toContain("Unknown argument: --unknown-argument");
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> whenStartingApp().withParameters("--unknown-argument"))
+                .withMessageContaining("Unknown argument: --unknown-argument");
     }
 
     private AppAction whenStartingApp(String... parameters) {
@@ -211,11 +209,11 @@ class AppTest {
     private record AppAction(String... parameters) {
 
         void withoutAnyParameter() {
-            App.main(new String[0]);
+            Orchestrator.execute(new String[0]);
         }
 
         void withParameters(String... parameters) {
-            App.main(parameters);
+            Orchestrator.execute(parameters);
         }
 
     }
