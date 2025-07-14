@@ -49,11 +49,16 @@ public class App {
 
         Optional<Exception> exception = parseArguments(args);
         if (exception.isPresent()) {
-            logger.severe(exception.get().getMessage());
-            printHelp();
+            showError(exception.get());
         } else {
             processCommand(args);
         }
+    }
+
+    @SuppressWarnings("java:S106")
+    private static void showError(Exception exception) {
+        System.err.println(exception.getMessage());
+        printHelp();
     }
 
     private static void processCommand(String[] args) {
