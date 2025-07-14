@@ -48,11 +48,8 @@ public class App {
         }
 
         Optional<Exception> exception = parseArguments(args);
-        if (exception.isPresent()) {
-            failAndExit(exception.get());
-        } else {
-            processCommand(args);
-        }
+        exception.ifPresent(App::failAndExit);
+        processCommand(args);
     }
 
     @SuppressWarnings("java:S106")
