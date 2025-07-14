@@ -42,6 +42,10 @@ public class App {
 
 
     public static void main(String[] args) {
+        if (isHelpMessage(args)) {
+            printHelp();
+            return;
+        }
         parseArguments(args);
         setLogLevel(LOG_LEVEL);
 
@@ -50,6 +54,31 @@ public class App {
 
         var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, bin);
         imageDeduplicator.execute(action, directory);
+    }
+
+    private static boolean isHelpMessage(String[] args) {
+        return stream(args)
+                .anyMatch(argument -> argument.equals("-h") || argument.equals("--help"));
+    }
+
+    @SuppressWarnings("java:S106")
+    private static void printHelp() {
+        System.out.println("""
+Usage:
+  nodup [/path/to/dir] [OPTIONS]
+
+Positional parameters:
+  $1               (Optional) The path to the directory to process \s
+
+Options:
+  --log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).
+
+Flags:
+  -c, --copy       Copy files in the directory.
+  -m, --move       Move files in the directory.
+  -s, --scan       Scan the directory and display file information.
+  -h, --help       Print this help message and exit           
+""");
     }
 
     private static String readDirectory(String[] args) {

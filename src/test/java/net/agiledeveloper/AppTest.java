@@ -180,6 +180,19 @@ class AppTest {
                 .toContain("Log level: FINE");
     }
 
+    @Test
+    void it_prints_an_help_message() {
+        whenStartingApp()
+                .withParameters("--help");
+
+        expectLog()
+                .toContain("nodup [/path/to/dir] [OPTIONS]")
+                .toContain("Positional parameters:")
+                .toContain("$1               (Optional) The path to the directory to process")
+                .toContain("Options:")
+                .toContain("--log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).")
+                .toContain("Flags:");
+    }
 
     private AppAction whenStartingApp(String... parameters) {
         return new AppAction(parameters);
