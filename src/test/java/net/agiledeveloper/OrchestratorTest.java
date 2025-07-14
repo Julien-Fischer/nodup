@@ -230,17 +230,11 @@ class OrchestratorTest {
     }
 
 
-    private AppAction whenStartingApp(String... parameters) {
-        return new AppAction(parameters);
+    private AppAction whenStartingApp() {
+        return new AppAction();
     }
 
     private class AppAction {
-
-        private final String[] parameters;
-
-        public AppAction(String... parameters) {
-            this.parameters = parameters;
-        }
 
         void withoutAnyParameter() {
             orchestrator.execute(new String[0]);
