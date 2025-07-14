@@ -12,7 +12,7 @@ import static net.agiledeveloper.App.*;
 
 public class Orchestrator {
 
-    public static void execute(String[] args) {
+    public void execute(String[] args) {
         if (isHelpMessage(args)) {
             printHelp();
             return;
@@ -22,7 +22,7 @@ public class Orchestrator {
         processCommand(args);
     }
 
-    private static void processCommand(String[] args) {
+    private void processCommand(String[] args) {
         setLogLevel(LOG_LEVEL);
 
         var directory = readDirectory(args);

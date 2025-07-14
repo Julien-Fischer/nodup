@@ -40,7 +40,7 @@ public class App {
 
     public static void main(String[] args) {
         try {
-             Orchestrator.execute(args);
+             new Orchestrator().execute(args);
         } catch (IllegalArgumentException exception) {
             failAndExit(exception);
         }

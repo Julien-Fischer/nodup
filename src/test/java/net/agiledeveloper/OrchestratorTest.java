@@ -40,6 +40,8 @@ class OrchestratorTest {
     public StubImageProvider imageProvider = new StubImageProvider();
     public StubBin bin = new StubBin(tempDir);
 
+    private static final Orchestrator orchestrator = new Orchestrator();
+
     private final List<Class<?>> loggersToMock = List.of(
             App.class,
             Orchestrator.class,
@@ -209,11 +211,11 @@ class OrchestratorTest {
     private record AppAction(String... parameters) {
 
         void withoutAnyParameter() {
-            Orchestrator.execute(new String[0]);
+            orchestrator.execute(new String[0]);
         }
 
         void withParameters(String... parameters) {
-            Orchestrator.execute(parameters);
+            orchestrator.execute(parameters);
         }
 
     }
