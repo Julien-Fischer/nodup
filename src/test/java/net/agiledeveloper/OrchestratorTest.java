@@ -122,16 +122,18 @@ class OrchestratorTest {
     @Test
     void duplicates_are_moved_to_bin() throws IOException {
         havingDirectoryToScan("directory");
-        var a = aDogImage().located(directoryToScan).named("dog-a").build();
-        var b = aDogImage().located(directoryToScan).named("dog-b").build();
+        var dogA = aDogImage().located(directoryToScan).named("dog-a").build();
+        var dogB = aDogImage().located(directoryToScan).named("dog-b").build();
+        var catA = aCatImage().located(directoryToScan).named("cat-a").build();
+        var catB = aCatImage().located(directoryToScan).named("cat-b").build();
         givenThat(directoryToScan)
-                .contains(aBigDog(), a, b, aCat());
+                .contains(aBigDog(), dogA, catA, catB, dogB);
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--move");
 
-        assertThatDuplicatesWereMoved(1)
-                .forImages(a);
+        assertThatDuplicatesWereMoved(2)
+                .forImages(catA, dogA);
     }
 
     @Test
