@@ -58,7 +58,6 @@ class OrchestratorTest {
     void setUp() {
         mockStdout();
         mockLogger();
-        mockBin();
         buildOrchestrator();
     }
 
@@ -299,11 +298,6 @@ class OrchestratorTest {
     private void mockStdout() {
         outputStream = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStream));
-    }
-
-    private void mockBin() {
-        bin = new StubBin(tempDir);
-        App.bin = bin;
     }
 
     private void buildOrchestrator() {
