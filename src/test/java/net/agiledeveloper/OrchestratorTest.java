@@ -73,7 +73,7 @@ class OrchestratorTest {
 
 
     @Test
-    void without_parameters_fails() throws IOException {
+    void it_uses_the_current_directory_by_default() throws IOException {
         havingDirectoryNamed("directory");
 
         whenStartingApp()
