@@ -20,7 +20,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -29,6 +31,7 @@ import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class OrchestratorTest {
 
@@ -41,6 +44,7 @@ class OrchestratorTest {
     private ByteArrayOutputStream outputStream;
 
     private final StubImageProvider imageProvider = new StubImageProvider();
+    private final StubDirectoryOpener directoryOpener = new StubDirectoryOpener();
 
     private StubBin bin;
     private ImageDeduplicator imageDeduplicator;
@@ -58,6 +62,7 @@ class OrchestratorTest {
     void setUp() {
         mockStdout();
         mockLogger();
+        clearStubs();
         buildOrchestrator();
     }
 
@@ -203,6 +208,28 @@ class OrchestratorTest {
                 .withMessageContaining("Unknown argument: --unknown-argument");
     }
 
+    @Test
+    void it_opens_bin_directory() {
+        whenStartingApp()
+                .withParameters("--bin");
+
+        expect(directoryOpener)
+                .toHaveOpened(bin.root());
+    }
+
+    private DirectoryOpenerAssertion expect(StubDirectoryOpener directoryOpener) {
+        return new DirectoryOpenerAssertion(directoryOpener);
+    }
+
+    private record DirectoryOpenerAssertion(StubDirectoryOpener directoryOpener) {
+
+        public void toHaveOpened(Path expected) {
+            assertThat(directoryOpener.openedDirectories).contains(expected);
+        }
+
+    }
+
+
     private AppAction whenStartingApp(String... parameters) {
         return new AppAction(parameters);
     }
@@ -286,6 +313,11 @@ class OrchestratorTest {
 
     }
 
+    private void clearStubs() {
+        imageProvider.clear();
+        directoryOpener.clear();
+    }
+
     private void mockLogger() {
         handler = new TestHandler();
         loggersToMock.forEach(type -> {
@@ -301,10 +333,9 @@ class OrchestratorTest {
     }
 
     private void buildOrchestrator() {
-        imageProvider.clear();
         bin = new StubBin(tempDir);
         imageDeduplicator = new ImageDeduplicator(new ExifProcessor(new PixelCollisionDetector()), imageProvider, bin);
-        orchestrator = new Orchestrator(imageDeduplicator);
+        orchestrator = new Orchestrator(imageDeduplicator, directoryOpener);
     }
 
 
@@ -396,6 +427,21 @@ class OrchestratorTest {
 
     }
 
+    private static class StubDirectoryOpener implements DirectoryOpener {
+
+        private final Queue<Path> openedDirectories = new LinkedList<>();
+
+        @Override
+        public void open(Path directory) throws UnsupportedOperationException {
+            openedDirectories.add(directory);
+        }
+
+        public void clear() {
+            openedDirectories.clear();
+        }
+
+    }
+
     private static class StubImageProvider implements ImageProvider {
 
         private final List<Image> images = new ArrayList<>();
@@ -418,9 +464,13 @@ class OrchestratorTest {
     private record StubBin(Path parentDirectory) implements Bin {
 
         @Override
+        public Path root() {
+            return Paths.get("bin-directory");
+        }
+
+        @Override
         public Path path() {
-            var rootBinDirectory = Paths.get("bin-directory");
-            Path currentBin = parentDirectory.resolve(rootBinDirectory);
+            Path currentBin = parentDirectory.resolve(root());
             try {
                 Files.createDirectories(currentBin.getParent());
                 Files.createDirectories(currentBin);

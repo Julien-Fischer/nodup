@@ -13,24 +13,26 @@ import static net.agiledeveloper.App.*;
 public class Orchestrator {
 
     private final ImageDeduplicator imageDeduplicator;
+    private final DirectoryOpener directoryOpener;
     private Action action = App.DEFAULT_ACTION;
 
 
-    public Orchestrator(ImageDeduplicator imageDeduplicator) {
+    public Orchestrator(ImageDeduplicator imageDeduplicator, DirectoryOpener directoryOpener) {
         this.imageDeduplicator = imageDeduplicator;
+        this.directoryOpener = directoryOpener;
     }
 
 
     public void execute(String[] args) {
         if (isHelpMessage(args)) {
             printHelp();
-            return;
+        } else if(isOpenBin(args)) {
+            openBin();
+        } else {
+            parseArguments(args);
+            processCommand(args);
         }
-
-        parseArguments(args);
-        processCommand(args);
     }
-
 
     private void processCommand(String[] args) {
         setLogLevel(LOG_LEVEL);
@@ -39,6 +41,14 @@ public class Orchestrator {
         logConfig(directory);
 
         imageDeduplicator.execute(action, directory);
+    }
+
+    private static boolean isOpenBin(String[] arguments) {
+        return asList(arguments).contains("--bin");
+    }
+
+    private void openBin() {
+        directoryOpener.open(imageDeduplicator.binRoot());
     }
 
     private static boolean isHelpMessage(String[] args) {
@@ -63,6 +73,7 @@ Flags:
   -m, --move       Move files in the directory.
   -s, --scan       Scan the directory and display file information.
   -h, --help       Print this help message and exit
+  --bin            Open the bin directory (requires a GUI environment)
 """);
     }
 
@@ -76,7 +87,7 @@ Flags:
         logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
         logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
         logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
-        logger.info(() -> "Bin: %s".formatted(imageDeduplicator.binPath()));
+        logger.info(() -> "Bin: %s".formatted(imageDeduplicator.binRoot()));
     }
 
     private void parseArguments(String[] arguments) {
@@ -93,7 +104,7 @@ Flags:
     }
 
     private static Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
-        String[] supported = {"--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log"};
+        String[] supported = {"--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log", "--bin"};
         for (int i = 0; i < arguments.length; i++) {
             String argument = arguments[i];
             if (i == 0 && !argument.startsWith("-")) {

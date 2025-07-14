@@ -4,6 +4,8 @@ import java.nio.file.Path;
 
 public interface Bin {
 
+    Path root();
+
     Path path();
 
 

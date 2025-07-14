@@ -64,8 +64,8 @@ public class ImageDeduplicator {
         logger.info(() -> "Elapsed time: %s ms".formatted(duration.toMillis()));
     }
 
-    public Path binPath() {
-        return bin.path();
+    public Path binRoot() {
+        return bin.root();
     }
 
     private void processDuplicate(Collection<Collision> collisions) throws IOException {

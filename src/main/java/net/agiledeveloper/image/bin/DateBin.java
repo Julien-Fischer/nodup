@@ -14,33 +14,43 @@ public class DateBin implements Bin {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd_HH-mm-ss");
 
-    private Path directory;
+    private Path rootDirectory;
+    private Path currentDirectory;
 
 
     @Override
-    public Path path() {
-        if (directory == null) {
-            try {
-                directory = initialize();
-            } catch (IOException e) {
-                throw new Bin.InitializationException(e);
-            }
-        }
-        return directory;
+    public Path root() {
+        lazyload(rootDirectory);
+        return rootDirectory;
     }
 
-    private Path initialize() throws IOException {
+    @Override
+    public Path path() {
+        lazyload(currentDirectory);
+        return currentDirectory;
+    }
+
+
+    private void lazyload(Path directory) {
+        if (directory == null) {
+            try {
+                initialize();
+            } catch (IOException e) {
+                throw new InitializationException(e);
+            }
+        }
+    }
+
+    private void initialize() throws IOException {
         String directoryName = LocalDateTime.now().format(DATE_TIME_FORMATTER);
         String userHome = System.getProperty("user.home");
         File newDir = new File(userHome, COLLISION_BIN_NAME);
         if (!newDir.exists() && !newDir.mkdirs()) {
             throw new IOException("Failed to create directory: " + newDir.getAbsolutePath());
         }
-        Path currentBin = newDir
-                .toPath()
-                .resolve(directoryName);
-        Files.createDirectories(currentBin);
-        return currentBin;
+        rootDirectory = newDir.toPath();
+        currentDirectory = rootDirectory.resolve(directoryName);
+        Files.createDirectories(currentDirectory);
     }
 
 }

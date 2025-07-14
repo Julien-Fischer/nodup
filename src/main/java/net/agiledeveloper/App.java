@@ -39,7 +39,7 @@ public class App {
     public static void main(String[] args) {
         try {
             var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, new DateBin());
-            new Orchestrator(imageDeduplicator).execute(args);
+            new Orchestrator(imageDeduplicator, new GUIDirectoryOpener()).execute(args);
         } catch (IllegalArgumentException exception) {
             failAndExit(exception);
         }
