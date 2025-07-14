@@ -38,7 +38,7 @@ public class Orchestrator {
     }
 
     @SuppressWarnings("java:S106")
-    private static void printHelp() {
+    public static void printHelp() {
         System.out.println("""
 Usage:
   nodup [/path/to/dir] [OPTIONS]

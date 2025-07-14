@@ -50,30 +50,9 @@ public class App {
     private static void failAndExit(Exception exception) {
         System.err.println("E: " + exception.getMessage());
         System.out.println();
-        printHelp();
+        Orchestrator.printHelp();
         System.exit(1);
     }
-
-    @SuppressWarnings("java:S106")
-    private static void printHelp() {
-        System.out.println("""
-Usage:
-  nodup [/path/to/dir] [OPTIONS]
-
-Positional parameters:
-  $1               (Optional) The path to the directory to process
-
-Options:
-  --log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).
-
-Flags:
-  -c, --copy       Copy files in the directory.
-  -m, --move       Move files in the directory.
-  -s, --scan       Scan the directory and display file information.
-  -h, --help       Print this help message and exit
-""");
-    }
-
 
     public static class MessageFormatter extends Formatter {
 
