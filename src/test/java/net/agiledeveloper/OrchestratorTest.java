@@ -37,8 +37,8 @@ class OrchestratorTest {
     private final PrintStream originalOut = System.out;
     private ByteArrayOutputStream outputStream;
 
-    public StubImageProvider imageProvider = new StubImageProvider();
-    public StubBin bin = new StubBin(tempDir);
+    private final StubImageProvider imageProvider = new StubImageProvider();
+    private StubBin bin = new StubBin(tempDir);
 
     private static final Orchestrator orchestrator = new Orchestrator();
 
