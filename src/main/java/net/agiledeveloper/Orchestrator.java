@@ -13,6 +13,7 @@ import static net.agiledeveloper.App.*;
 public class Orchestrator {
 
     private final ImageDeduplicator imageDeduplicator;
+    private Action action = App.DEFAULT_ACTION;
 
 
     public Orchestrator(ImageDeduplicator imageDeduplicator) {
@@ -70,15 +71,15 @@ Flags:
         return isDefined ? args[0] : System.getProperty("user.dir");
     }
 
-    private static void logConfig(String directory) {
+    private void logConfig(String directory) {
         logger.info(() -> "%s duplicates in %s".formatted(action, directory));
         logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
         logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
         logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
-        logger.info(() -> "Bin: %s".formatted(bin.path()));
+        logger.info(() -> "Bin: %s".formatted(imageDeduplicator.binPath()));
     }
 
-    private static void parseArguments(String[] arguments) {
+    private void parseArguments(String[] arguments) {
         Optional<IllegalArgumentException> unknownArgument = findUnknownArguments(arguments);
         if (unknownArgument.isPresent()) {
             throw unknownArgument.get();

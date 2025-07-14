@@ -3,7 +3,6 @@ package net.agiledeveloper;
 import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.SimpleImageProvider;
-import net.agiledeveloper.image.bin.Bin;
 import net.agiledeveloper.image.bin.DateBin;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifProcessor;
@@ -34,14 +33,12 @@ public class App {
 
     public static final Logger logger = Logger.getLogger(App.class.getSimpleName());
     public static ImageProvider imageProvider = new SimpleImageProvider();
-    public static Bin bin = new DateBin();
-    public static Action action = DEFAULT_ACTION;
     public static Level LOG_LEVEL = DEFAULT_LOG_LEVEL;
 
 
     public static void main(String[] args) {
         try {
-            var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, bin);
+            var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, new DateBin());
             new Orchestrator(imageDeduplicator).execute(args);
         } catch (IllegalArgumentException exception) {
             failAndExit(exception);
