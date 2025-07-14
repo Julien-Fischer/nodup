@@ -1,5 +1,6 @@
 package net.agiledeveloper;
 
+import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.SimpleImageProvider;
 import net.agiledeveloper.image.bin.Bin;
@@ -40,7 +41,8 @@ public class App {
 
     public static void main(String[] args) {
         try {
-             new Orchestrator().execute(args);
+            var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, bin);
+            new Orchestrator(imageDeduplicator).execute(args);
         } catch (IllegalArgumentException exception) {
             failAndExit(exception);
         }

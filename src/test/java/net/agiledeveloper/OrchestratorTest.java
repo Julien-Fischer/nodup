@@ -5,6 +5,8 @@ import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.bin.Bin;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
+import net.agiledeveloper.image.processors.ExifProcessor;
+import net.agiledeveloper.image.processors.collision.PixelCollisionDetector;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +27,8 @@ import java.util.logging.Logger;
 
 import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
-import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 class OrchestratorTest {
 
@@ -38,9 +41,10 @@ class OrchestratorTest {
     private ByteArrayOutputStream outputStream;
 
     private final StubImageProvider imageProvider = new StubImageProvider();
-    private StubBin bin = new StubBin(tempDir);
 
-    private static final Orchestrator orchestrator = new Orchestrator();
+    private StubBin bin;
+    private ImageDeduplicator imageDeduplicator;
+    private Orchestrator orchestrator;
 
     private final List<Class<?>> loggersToMock = List.of(
             App.class,
@@ -54,8 +58,8 @@ class OrchestratorTest {
     void setUp() {
         mockStdout();
         mockLogger();
-        mockImageProvider();
         mockBin();
+        buildOrchestrator();
     }
 
 
@@ -64,12 +68,6 @@ class OrchestratorTest {
         System.setOut(originalOut);
     }
 
-
-    @Test
-    void it_throws_no_exception() {
-        assertThatNoException()
-                .isThrownBy(Orchestrator::new);
-    }
 
     @Test
     void without_parameters_fails() throws IOException {
@@ -210,7 +208,13 @@ class OrchestratorTest {
         return new AppAction(parameters);
     }
 
-    private record AppAction(String... parameters) {
+    private class AppAction {
+
+        private final String[] parameters;
+
+        public AppAction(String... parameters) {
+            this.parameters = parameters;
+        }
 
         void withoutAnyParameter() {
             orchestrator.execute(new String[0]);
@@ -228,17 +232,17 @@ class OrchestratorTest {
 
     private FilePrecondition havingDirectoryNamed(String directory) throws IOException {
         havingDirectoryToScan(directory);
-        return new FilePrecondition(imageProvider, this.directoryToScan);
+        return new FilePrecondition(imageProvider, directoryToScan);
     }
 
     private void havingDirectoryToScan(String directory) throws IOException {
-        this.directoryToScan = tempDir.resolve(directory);
-        Files.createDirectory(this.directoryToScan);
+        directoryToScan = tempDir.resolve(directory);
+        Files.createDirectory(directoryToScan);
     }
 
     private void assertThatFilesWereFound(int count) {
         expectLog()
-                .toContain("Found %s images in %s".formatted(count, this.directoryToScan));
+                .toContain("Found %s images in %s".formatted(count, directoryToScan));
     }
 
     private void assertThatNoFilesWereFound() {
@@ -302,9 +306,11 @@ class OrchestratorTest {
         App.bin = bin;
     }
 
-    private void mockImageProvider() {
+    private void buildOrchestrator() {
         imageProvider.clear();
-        App.imageProvider = imageProvider;
+        bin = new StubBin(tempDir);
+        imageDeduplicator = new ImageDeduplicator(new ExifProcessor(new PixelCollisionDetector()), imageProvider, bin);
+        orchestrator = new Orchestrator(imageDeduplicator);
     }
 
 

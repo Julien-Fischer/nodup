@@ -12,6 +12,14 @@ import static net.agiledeveloper.App.*;
 
 public class Orchestrator {
 
+    private final ImageDeduplicator imageDeduplicator;
+
+
+    public Orchestrator(ImageDeduplicator imageDeduplicator) {
+        this.imageDeduplicator = imageDeduplicator;
+    }
+
+
     public void execute(String[] args) {
         if (isHelpMessage(args)) {
             printHelp();
@@ -22,13 +30,13 @@ public class Orchestrator {
         processCommand(args);
     }
 
+
     private void processCommand(String[] args) {
         setLogLevel(LOG_LEVEL);
 
         var directory = readDirectory(args);
         logConfig(directory);
 
-        var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, bin);
         imageDeduplicator.execute(action, directory);
     }
 
