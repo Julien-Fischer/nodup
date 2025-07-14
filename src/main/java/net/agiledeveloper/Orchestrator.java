@@ -24,9 +24,9 @@ public class Orchestrator {
 
 
     public void execute(String[] args) {
-        if (isHelpMessage(args)) {
+        if (isHelpRequest(args)) {
             printHelp();
-        } else if(isOpenBin(args)) {
+        } else if(isOpenBinRequest(args)) {
             openBin();
         } else {
             parseArguments(args);
@@ -43,7 +43,7 @@ public class Orchestrator {
         imageDeduplicator.execute(action, directory);
     }
 
-    private static boolean isOpenBin(String[] arguments) {
+    private static boolean isOpenBinRequest(String[] arguments) {
         return asList(arguments).contains("--bin");
     }
 
@@ -51,7 +51,7 @@ public class Orchestrator {
         directoryOpener.open(imageDeduplicator.binRoot());
     }
 
-    private static boolean isHelpMessage(String[] args) {
+    private static boolean isHelpRequest(String[] args) {
         return stream(args)
                 .anyMatch(argument -> argument.equals("-h") || argument.equals("--help"));
     }
