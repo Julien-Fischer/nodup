@@ -47,7 +47,6 @@ class OrchestratorTest {
     private final StubDirectoryOpener directoryOpener = new StubDirectoryOpener();
 
     private StubBin bin;
-    private ImageDeduplicator imageDeduplicator;
     private Orchestrator orchestrator;
 
     private final List<Class<?>> loggersToMock = List.of(
@@ -217,6 +216,7 @@ class OrchestratorTest {
                 .toHaveOpened(bin.root());
     }
 
+
     private DirectoryOpenerAssertion expect(StubDirectoryOpener directoryOpener) {
         return new DirectoryOpenerAssertion(directoryOpener);
     }
@@ -228,7 +228,6 @@ class OrchestratorTest {
         }
 
     }
-
 
     private AppAction whenStartingApp() {
         return new AppAction();
@@ -328,7 +327,8 @@ class OrchestratorTest {
 
     private void buildOrchestrator() {
         bin = new StubBin(tempDir);
-        imageDeduplicator = new ImageDeduplicator(new ExifProcessor(new PixelCollisionDetector()), imageProvider, bin);
+        var imageProcessor = new ExifProcessor(new PixelCollisionDetector());
+        var imageDeduplicator = new ImageDeduplicator(imageProcessor, imageProvider, bin);
         orchestrator = new Orchestrator(imageDeduplicator, directoryOpener);
     }
 
