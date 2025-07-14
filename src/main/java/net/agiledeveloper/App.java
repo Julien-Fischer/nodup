@@ -82,7 +82,7 @@ Flags:
     }
 
     private static String readDirectory(String[] args) {
-        boolean isDefined = args.length > 0 && !args[0].startsWith("--");
+        boolean isDefined = args.length > 0 && !args[0].startsWith("-");
         return isDefined ? args[0] : System.getProperty("user.dir");
     }
 
