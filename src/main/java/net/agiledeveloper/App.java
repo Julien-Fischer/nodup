@@ -110,15 +110,29 @@ Flags:
 
     private static Optional<Exception> parseArguments(String[] arguments) {
         try {
+            Optional<Exception> unknownArgument = findUnkownArguments(arguments);
+            if (unknownArgument.isPresent()) {
+                return unknownArgument;
+            }
+
             processLogLevel(arguments);
 
             for (String argument : arguments) {
                 action = readAction(argument);
             }
+
             return Optional.empty();
         } catch (IllegalArgumentException exception) {
             return Optional.of(exception);
         }
+    }
+
+    private static Optional<Exception> findUnkownArguments(String[] arguments) {
+            String[] supported = {"--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log"};
+            return stream(arguments)
+                    .filter(arg -> stream(supported).noneMatch(arg::equals) && !arg.startsWith("--log="))
+                    .findFirst()
+                    .map(arg -> new IllegalArgumentException("Unknown argument: " + arg));
     }
 
     private static void processLogLevel(String[] arguments) {

@@ -195,6 +195,15 @@ class AppTest {
                 .toContain("Flags:");
     }
 
+    @Test
+    void unknown_arguments_throw() {
+        whenStartingApp()
+                .withParameters("--unknown-argument");
+
+        expectStdout()
+                .toContain("Unknown argument: --unknown-argument");
+    }
+
     private AppAction whenStartingApp(String... parameters) {
         return new AppAction(parameters);
     }
