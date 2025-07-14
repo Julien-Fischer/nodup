@@ -1,7 +1,6 @@
 package net.agiledeveloper;
 
 import net.agiledeveloper.image.ImageDeduplicator;
-import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.SimpleImageProvider;
 import net.agiledeveloper.image.bin.DateBin;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
@@ -32,14 +31,15 @@ public class App {
     public static final String COLLISION_BIN_NAME = "%s/bin".formatted(APP_DIR);
 
     public static final Logger logger = Logger.getLogger(App.class.getSimpleName());
-    public static ImageProvider imageProvider = new SimpleImageProvider();
     public static Level LOG_LEVEL = DEFAULT_LOG_LEVEL;
 
 
     public static void main(String[] args) {
+        var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, new SimpleImageProvider(), new DateBin());
+        var orchestrator = new Orchestrator(imageDeduplicator, new GUIDirectoryOpener());
+
         try {
-            var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, imageProvider, new DateBin());
-            new Orchestrator(imageDeduplicator, new GUIDirectoryOpener()).execute(args);
+            orchestrator.execute(args);
         } catch (IllegalArgumentException exception) {
             failAndExit(exception);
         }
