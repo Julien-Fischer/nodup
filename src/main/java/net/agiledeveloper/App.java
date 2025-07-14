@@ -46,7 +46,17 @@ public class App {
             printHelp();
             return;
         }
-        parseArguments(args);
+
+        Optional<Exception> exception = parseArguments(args);
+        if (exception.isPresent()) {
+            logger.severe(exception.get().getMessage());
+            printHelp();
+        } else {
+            processCommand(args);
+        }
+    }
+
+    private static void processCommand(String[] args) {
         setLogLevel(LOG_LEVEL);
 
         var directory = readDirectory(args);
@@ -68,7 +78,7 @@ Usage:
   nodup [/path/to/dir] [OPTIONS]
 
 Positional parameters:
-  $1               (Optional) The path to the directory to process \s
+  $1               (Optional) The path to the directory to process
 
 Options:
   --log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).
@@ -77,7 +87,7 @@ Flags:
   -c, --copy       Copy files in the directory.
   -m, --move       Move files in the directory.
   -s, --scan       Scan the directory and display file information.
-  -h, --help       Print this help message and exit           
+  -h, --help       Print this help message and exit
 """);
     }
 
@@ -94,11 +104,16 @@ Flags:
         logger.info(() -> "Bin: %s".formatted(bin.path()));
     }
 
-    private static void parseArguments(String[] arguments) {
-        processLogLevel(arguments);
+    private static Optional<Exception> parseArguments(String[] arguments) {
+        try {
+            processLogLevel(arguments);
 
-        for (String argument : arguments) {
-            action = readAction(argument);
+            for (String argument : arguments) {
+                action = readAction(argument);
+            }
+            return Optional.empty();
+        } catch (IllegalArgumentException exception) {
+            return Optional.of(exception);
         }
     }
 
@@ -106,23 +121,13 @@ Flags:
         stream(arguments)
                 .filter(argument -> argument.startsWith("--log="))
                 .findFirst()
-                .flatMap(App::parseLogLevel)
+                .map(App::parseLogLevel)
                 .ifPresent(App::setLogLevel);
     }
 
-    private static Optional<Level> parseLogLevel(String argument) {
+    private static Level parseLogLevel(String argument) {
         String levelString = argument.substring("--log=".length());
-        try {
-            return Optional.of(readLogLevel(levelString));
-        } catch (IllegalArgumentException exception) {
-            fail(exception);
-            return Optional.empty();
-        }
-    }
-
-    private static void fail(Exception exception) {
-        logger.severe(exception.getMessage());
-        printHelp();
+        return readLogLevel(levelString);
     }
 
     public static Level readLogLevel(String levelName) {

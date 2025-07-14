@@ -12,6 +12,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -185,7 +186,7 @@ class AppTest {
         whenStartingApp()
                 .withParameters("--help");
 
-        expectLog()
+        expectStdout()
                 .toContain("nodup [/path/to/dir] [OPTIONS]")
                 .toContain("Positional parameters:")
                 .toContain("$1               (Optional) The path to the directory to process")
@@ -237,12 +238,21 @@ class AppTest {
         expectLog().toContain("Found 0 collisions");
     }
 
-    private void assertThatStdoutContains(String expected) {
-        try {
-            assertThat(outputStream.toString()).contains(expected);
-        } finally {
-            System.setOut(originalOut);
+    private StdoutAssertion expectStdout() {
+        return new StdoutAssertion(outputStream, originalOut);
+    }
+
+    private record StdoutAssertion(OutputStream outputStream, PrintStream originalOut) {
+
+        public StdoutAssertion toContain(String expected) {
+            try {
+                assertThat(outputStream.toString()).contains(expected);
+            } finally {
+                System.setOut(originalOut);
+            }
+            return this;
         }
+
     }
 
     private LogAssertion expectLog() {
