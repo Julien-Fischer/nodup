@@ -116,6 +116,15 @@ Flags:
                 .ifPresent(Orchestrator::setLogLevel);
     }
 
+    public static void setLogLevel(Level level) {
+        LOG_LEVEL = level;
+        logger.setLevel(level);
+        for (var handler : Logger.getLogger("").getHandlers()) {
+            handler.setFormatter(new MessageFormatter());
+            handler.setLevel(level);
+        }
+    }
+
     private static Level parseLogLevel(String argument) {
         String levelString = argument.substring("--log=".length());
         return readLogLevel(levelString);
@@ -139,15 +148,6 @@ Flags:
             case "-s", "--scan" -> App.Action.SCAN;
             default -> DEFAULT_ACTION;
         };
-    }
-
-    private static void setLogLevel(Level level) {
-        LOG_LEVEL = level;
-        logger.setLevel(level);
-        for (var handler : Logger.getLogger("").getHandlers()) {
-            handler.setFormatter(new App.MessageFormatter());
-            handler.setLevel(level);
-        }
     }
 
 }
