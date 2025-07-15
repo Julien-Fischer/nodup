@@ -38,42 +38,35 @@ public class ImageDeduplicator {
 
         long start = System.nanoTime();
 
-        logger.info(() -> "#".repeat(80));
+        logSeparator();
         Image[] images = imageProvider.imagesAt(directory);
-        logger.info(() -> "Found %s images in %s".formatted(images.length, directory));
+        logImages(directory, images);
+
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
-        logger.info(() -> "#".repeat(80));
-        logger.info(() -> "Found %s collisions:".formatted(collisions.size()));
-        for (Collision collision : collisions) {
-            logger.info(() -> "" + collision);
-        }
+
+        logSeparator();
+        logCollisions(collisions);
 
         if (action != SCAN) {
-            try {
-                logger.info(() -> "#".repeat(80));
-                logger.info(() -> "About to [%s] %s duplicates to %s:".formatted(action, collisions.size(), bin.path()));
-                processDuplicate(collisions);
-                logger.info(() -> "Done [%s] %s duplicates to %s:".formatted(action, collisions.size(), bin.path()));
-            } catch (IOException exception) {
-                logger.severe("Could not %s duplicates. Cause: %s".formatted(action, exception.getMessage()));
-            }
+            processDuplicates(action, collisions);
         }
 
-        long end = System.nanoTime();
-        var duration = Duration.ofNanos(end - start);
-        logger.info(() -> "Elapsed time: %s ms".formatted(duration.toMillis()));
+        logDurationSince(start);
     }
 
-    public Path binRoot() {
-        return bin.root();
-    }
-
-    private void processDuplicate(Collection<Collision> collisions) throws IOException {
-        for (var collision : collisions) {
-            Path sourcePath = collision.a().path();
-            Path targetPath = bin.path().resolve(sourcePath.getFileName());
-            performAction(sourcePath, targetPath);
-            logger.fine(() -> "File moved to: " + targetPath);
+    private void processDuplicates(Action action, Collection<Collision> collisions) {
+        try {
+            logSeparator();
+            logger.info(() -> "About to [%s] %s duplicates to %s:".formatted(action, collisions.size(), bin.path()));
+            for (var collision : collisions) {
+                Path sourcePath = collision.a().path();
+                Path targetPath = bin.path().resolve(sourcePath.getFileName());
+                performAction(sourcePath, targetPath);
+                logger.fine(() -> "File moved to: " + targetPath);
+            }
+            logger.info(() -> "Done [%s] %s duplicates to %s:".formatted(action, collisions.size(), bin.path()));
+        } catch (IOException exception) {
+            logger.severe("Could not %s duplicates. Cause: %s".formatted(action, exception.getMessage()));
         }
     }
 
@@ -83,6 +76,29 @@ public class ImageDeduplicator {
             case COPY -> Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             default -> throw new IllegalArgumentException("Unsupported action: " + action);
         }
+    }
+
+    public Path binRoot() {
+        return bin.root();
+    }
+
+    private void logDurationSince(long start) {
+        long end = System.nanoTime();
+        var duration = Duration.ofNanos(end - start);
+        logger.info(() -> "Elapsed time: %s ms".formatted(duration.toMillis()));
+    }
+
+    private void logSeparator() {
+        logger.info(() -> "#".repeat(80));
+    }
+
+    private void logImages(Path directory, Image[] images) {
+        logger.info(() -> "Found %s images in %s".formatted(images.length, directory));
+    }
+
+    private void logCollisions(Collection<Collision> collisions) {
+        logger.info(() -> "Found %s collisions:".formatted(collisions.size()));
+        collisions.forEach(collision -> logger.info(collision.toString()));
     }
 
 }
