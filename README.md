@@ -25,7 +25,7 @@ Cross-platform image deduplicator with an emphasis on performance
 
      `nodup ~/Images --move`
 
-  2. Optionally, check `~/collision_bin` for the scan / removal results
+  2. Optionally, check `~/nodup/bin` for the scan / removal results
 
 
 ## API
