@@ -33,7 +33,7 @@ public class ImageDeduplicator {
     }
 
 
-    public void execute(Action action, String directory) {
+    public void execute(Action action, Path directory) {
         this.action = action;
 
         long start = System.nanoTime();

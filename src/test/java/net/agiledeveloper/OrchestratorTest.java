@@ -216,6 +216,40 @@ class OrchestratorTest {
                 .toHaveOpened(bin.root());
     }
 
+    @Test
+    void unknown_directories_can_not_be_processed() throws IOException {
+        havingDirectoryNamed("directory")
+                .empty();
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> whenStartingApp().withParameters("/invalid/directory"))
+                .withMessageContaining("Could not find specified directory: /invalid/directory");
+    }
+
+    @Test
+    void invalid_directory_paths_can_not_be_processed() throws IOException {
+        TextFile textFile = aTextFile("a/text/file.txt");
+        havingDirectoryNamed("directory")
+                .containing(textFile);
+        String filePath = textFile.fullyQualifiedPath().toString();
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> whenStartingApp().withParameters(filePath))
+                .withMessageContaining("Specified path is not a directory: " + filePath);
+    }
+
+
+    private record TextFile(Path parentDirectory, Path path) {
+
+        public Path fullyQualifiedPath() {
+            return parentDirectory.resolve(path);
+        }
+
+    }
+
+    private TextFile aTextFile(String path) {
+        return new TextFile(tempDir, Paths.get(path));
+    }
 
     private DirectoryOpenerAssertion expect(StubDirectoryOpener directoryOpener) {
         return new DirectoryOpenerAssertion(directoryOpener);
@@ -370,6 +404,17 @@ class OrchestratorTest {
             }
         }
 
+        public void containing(TextFile... files) throws IOException {
+            for (var file : files) {
+                Path fileToCreate = file.fullyQualifiedPath();
+                Path parent = fileToCreate.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
+                Files.createFile(fileToCreate);
+            }
+        }
+
     }
 
     private CopyAssertion assertThatDuplicatesWereCopied(int count) {
@@ -449,7 +494,7 @@ class OrchestratorTest {
         }
 
         @Override
-        public Image[] imagesAt(String directory) {
+        public Image[] imagesAt(Path directory) {
             return images.toArray(new Image[0]);
         }
 

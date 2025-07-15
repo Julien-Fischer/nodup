@@ -2,6 +2,9 @@ package net.agiledeveloper;
 
 import net.agiledeveloper.image.ImageDeduplicator;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +40,14 @@ public class Orchestrator {
     private void processCommand(String[] args) {
         setLogLevel(LOG_LEVEL);
 
-        var directory = readDirectory(args);
+        Path directory = readDirectory(args);
+        if (!Files.exists(directory)) {
+            throw new IllegalArgumentException("Could not find specified directory: " + directory);
+        }
+        if (!Files.isDirectory(directory)) {
+            throw new IllegalArgumentException("Specified path is not a directory: " + directory);
+        }
+
         logConfig(directory);
 
         imageDeduplicator.execute(action, directory);
@@ -77,12 +87,13 @@ Flags:
 """);
     }
 
-    private static String readDirectory(String[] args) {
+    private static Path readDirectory(String[] args) {
         boolean isDefined = args.length > 0 && !args[0].startsWith("-");
-        return isDefined ? args[0] : System.getProperty("user.dir");
+        String directory = isDefined ? args[0] : System.getProperty("user.dir");
+        return Paths.get(directory);
     }
 
-    private void logConfig(String directory) {
+    private void logConfig(Path directory) {
         logger.info(() -> "%s duplicates in %s".formatted(action, directory));
         logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
         logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));

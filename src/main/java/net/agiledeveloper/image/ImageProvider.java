@@ -1,7 +1,9 @@
 package net.agiledeveloper.image;
 
+import java.nio.file.Path;
+
 public interface ImageProvider {
 
-    Image[] imagesAt(String directory);
+    Image[] imagesAt(Path directory);
 
 }
