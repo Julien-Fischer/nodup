@@ -228,7 +228,7 @@ class OrchestratorTest {
 
     @Test
     void invalid_directory_paths_can_not_be_processed() throws IOException {
-        TextFile textFile = aTextFile("a/text/file.txt");
+        var textFile = aTextFile("a/text/file.txt");
         havingDirectoryNamed("directory")
                 .containing(textFile);
         String filePath = textFile.fullyQualifiedPath().toString();
