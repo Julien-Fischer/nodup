@@ -40,17 +40,20 @@ public class Orchestrator {
     private void processCommand(String[] args) {
         setLogLevel(LOG_LEVEL);
 
-        Path directory = readDirectory(args);
+        Path directory = requireValid(readDirectory(args));
+        logConfig(directory);
+
+        imageDeduplicator.execute(action, directory);
+    }
+
+    private static Path requireValid(Path directory) {
         if (!Files.exists(directory)) {
             throw new IllegalArgumentException("Could not find specified directory: " + directory);
         }
         if (!Files.isDirectory(directory)) {
             throw new IllegalArgumentException("Specified path is not a directory: " + directory);
         }
-
-        logConfig(directory);
-
-        imageDeduplicator.execute(action, directory);
+        return directory;
     }
 
     private static boolean isOpenBinRequest(String[] arguments) {
