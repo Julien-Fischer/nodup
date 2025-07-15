@@ -4,9 +4,11 @@ import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.bin.Bin;
+import net.agiledeveloper.image.bin.Bin.PathProvider;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifProcessor;
 import net.agiledeveloper.image.processors.collision.PixelCollisionDetector;
+import net.agiledeveloper.stubs.StubImage.ImageBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,6 @@ import java.util.logging.Logger;
 
 import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -46,11 +47,13 @@ class OrchestratorTest {
     private final StubImageProvider imageProvider = new StubImageProvider();
     private final StubDirectoryOpener directoryOpener = new StubDirectoryOpener();
 
-    private StubBin bin;
+    private PathProvider pathProvider;
+    private Bin bin;
     private Orchestrator orchestrator;
 
     private final List<Class<?>> loggersToMock = List.of(
             App.class,
+            Bin.class,
             Orchestrator.class,
             ImageDeduplicator.class,
             BruteForceProcessor.class
@@ -238,6 +241,101 @@ class OrchestratorTest {
                 .withMessageContaining("Specified path is not a directory: " + filePath);
     }
 
+    @Test
+    void only_create_bin_directory_on_duplicate_copy() throws IOException {
+        givenThat(aDogImage()).hasDuplicates(1);
+
+        expect(bin).toBeEmpty();
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--copy");
+
+        expect(bin).toContain(aDogImage());
+    }
+
+    @Test
+    void only_create_bin_directory_on_duplicate_move() throws IOException {
+        givenThat(aDogImage()).hasDuplicates(1);
+
+        expect(bin).toBeEmpty();
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--move");
+
+        expect(bin).toContain(aDogImage());
+    }
+
+    @Test
+    void do_create_bin_directory_on_duplicate_scan() throws IOException {
+        givenThat(aDogImage()).hasDuplicates(1);
+
+        expect(bin).toBeEmpty();
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--scan");
+
+        expect(bin).toBeEmpty();
+    }
+
+
+    private ImageDuplication givenThat(ImageBuilder image) {
+        return new ImageDuplication(image);
+    }
+
+    private class ImageDuplication {
+
+        private final ImageBuilder original;
+
+        public ImageDuplication(ImageBuilder original) {
+            this.original = original;
+        }
+
+        void hasDuplicates(int times) throws IOException {
+            havingDirectoryToScan("directory");
+            ImageBuilder prototype = original.located(directoryToScan);
+            givenThat(directoryToScan)
+                    .contains(prototype.build());
+            for (int i = 1; i <= times; i++) {
+                Image duplicate = prototype
+                        .named(original.name() + "-" + i)
+                        .build();
+                givenThat(directoryToScan)
+                        .contains(duplicate);
+            }
+        }
+
+    }
+
+    private BinAssertion expect(Bin bin) {
+        return new BinAssertion(pathProvider, bin);
+    }
+
+    private record BinAssertion(PathProvider pathProvider, Bin bin) {
+
+        public void toBeEmpty() {
+            assertThat(Files.exists(currentBin())).isFalse();
+        }
+
+        public void toNotBeEmpty() {
+            assertThat(Files.exists(currentBin())).isTrue();
+        }
+
+        public void toContain(ImageBuilder image) {
+            try (var stream = Files.list(currentBin())) {
+                boolean contains = stream
+                        .filter(Files::isRegularFile)
+                        .anyMatch(p -> p.getFileName().equals(image.build().path().getFileName()));
+                assertThat(contains).isTrue();
+            } catch (IOException cause) {
+                throw new RuntimeException("listFiles failed: " + cause, cause);
+            }
+        }
+
+        private Path currentBin() {
+            return pathProvider.currentBin();
+        }
+
+    }
 
     private record TextFile(Path parentDirectory, Path path) {
 
@@ -360,7 +458,8 @@ class OrchestratorTest {
     }
 
     private void buildOrchestrator() {
-        bin = new StubBin(tempDir);
+        pathProvider = new StubPathProvider(tempDir);
+        bin = new Bin(pathProvider);
         var imageProcessor = new ExifProcessor(new PixelCollisionDetector());
         var imageDeduplicator = new ImageDeduplicator(imageProcessor, imageProvider, bin);
         orchestrator = new Orchestrator(imageDeduplicator, directoryOpener);
@@ -419,7 +518,7 @@ class OrchestratorTest {
 
     private CopyAssertion assertThatDuplicatesWereCopied(int count) {
         expectLog()
-                .toContain("About to [COPY] %d duplicates to %s".formatted(count, bin.path()));
+                .toContain("About to [COPY] %d duplicates to %s".formatted(count, pathProvider.currentBin()));
         return new CopyAssertion();
     }
 
@@ -427,14 +526,14 @@ class OrchestratorTest {
 
         public void forImages(Image... images) {
             expectLog()
-                    .toContain("Done [COPY] %s duplicates to %s".formatted(images.length, bin.path()));
+                    .toContain("Done [COPY] %s duplicates to %s".formatted(images.length, pathProvider.currentBin()));
         }
 
     }
 
     private MoveAssertion assertThatDuplicatesWereMoved(int count) {
         expectLog()
-                .toContain("About to [MOVE] %d duplicates to %s".formatted(count, bin.path()));
+                .toContain("About to [MOVE] %d duplicates to %s".formatted(count, pathProvider.currentBin()));
         return new MoveAssertion();
     }
 
@@ -442,7 +541,7 @@ class OrchestratorTest {
 
         public void forImages(Image... images) {
             expectLog()
-                    .toContain("Done [MOVE] %s duplicates to %s".formatted(images.length, bin.path()));
+                    .toContain("Done [MOVE] %s duplicates to %s".formatted(images.length, pathProvider.currentBin()));
         }
 
     }
@@ -500,23 +599,16 @@ class OrchestratorTest {
 
     }
 
-    private record StubBin(Path parentDirectory) implements Bin {
+    private record StubPathProvider(Path parentDirectory) implements PathProvider {
 
         @Override
         public Path root() {
-            return Paths.get("bin-directory");
+            return Paths.get("bin");
         }
 
         @Override
-        public Path path() {
-            Path currentBin = parentDirectory.resolve(root());
-            try {
-                Files.createDirectories(currentBin.getParent());
-                Files.createDirectories(currentBin);
-            } catch (IOException cause) {
-                throw new Bin.InitializationException("Could not initialize bin: " + cause.getMessage());
-            }
-            return currentBin;
+        public Path currentBin() {
+            return parentDirectory.resolve(root());
         }
 
     }

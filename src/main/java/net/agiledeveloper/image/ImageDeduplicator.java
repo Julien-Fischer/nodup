@@ -6,9 +6,7 @@ import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.logging.Logger;
@@ -17,13 +15,11 @@ import static net.agiledeveloper.App.Action.SCAN;
 
 public class ImageDeduplicator {
 
-    private final Logger logger = Logger.getLogger(ImageDeduplicator.class.getSimpleName());
+    private final Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     private final ImageProcessor imageProcessor;
     private final ImageProvider imageProvider;
     private final Bin bin;
-
-    private Action action;
 
 
     public ImageDeduplicator(ImageProcessor imageProcessor, ImageProvider imageProvider, Bin bin) {
@@ -34,8 +30,6 @@ public class ImageDeduplicator {
 
 
     public void execute(Action action, Path directory) {
-        this.action = action;
-
         long start = System.nanoTime();
 
         logSeparator();
@@ -57,24 +51,12 @@ public class ImageDeduplicator {
     private void processDuplicates(Action action, Collection<Collision> collisions) {
         try {
             logSeparator();
-            logger.info(() -> "About to [%s] %s duplicates to %s:".formatted(action, collisions.size(), bin.path()));
-            for (var collision : collisions) {
-                Path sourcePath = collision.a().path();
-                Path targetPath = bin.path().resolve(sourcePath.getFileName());
-                performAction(sourcePath, targetPath);
-                logger.fine(() -> "File moved to: " + targetPath);
-            }
-            logger.info(() -> "Done [%s] %s duplicates to %s:".formatted(action, collisions.size(), bin.path()));
+            Collection<Path> duplicates = collisions.stream()
+                    .map(collision -> collision.a().path())
+                    .toList();
+            bin.accept(action, duplicates);
         } catch (IOException exception) {
             logger.severe("Could not %s duplicates. Cause: %s".formatted(action, exception.getMessage()));
-        }
-    }
-
-    private void performAction(Path sourcePath, Path targetPath) throws IOException {
-        switch (action) {
-            case MOVE -> Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            case COPY -> Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            default -> throw new IllegalArgumentException("Unsupported action: " + action);
         }
     }
 

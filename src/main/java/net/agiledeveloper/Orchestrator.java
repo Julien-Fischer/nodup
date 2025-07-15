@@ -101,7 +101,6 @@ Flags:
         logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
         logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
         logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
-        logger.info(() -> "Bin: %s".formatted(imageDeduplicator.binRoot()));
     }
 
     private void parseArguments(String[] arguments) {

@@ -2,7 +2,8 @@ package net.agiledeveloper;
 
 import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.SimpleImageProvider;
-import net.agiledeveloper.image.bin.DateBin;
+import net.agiledeveloper.image.bin.Bin;
+import net.agiledeveloper.image.bin.DatePathProvider;
 import net.agiledeveloper.image.processors.BruteForceProcessor;
 import net.agiledeveloper.image.processors.ExifProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor;
@@ -27,15 +28,15 @@ public class App {
     public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
     public static final Collider COLLIDER = Collider.PIXEL;
     public static final Processor PROCESSOR = Processor.EXIF;
-    public static final String APP_DIR = "nodup";
-    public static final String COLLISION_BIN_NAME = "%s/bin".formatted(APP_DIR);
+    public static final String ROOT_DIR = "nodup";
 
     public static final Logger logger = Logger.getLogger(App.class.getSimpleName());
     public static Level LOG_LEVEL = DEFAULT_LOG_LEVEL;
 
 
     public static void main(String[] args) {
-        var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, new SimpleImageProvider(), new DateBin());
+        var bin = new Bin(new DatePathProvider());
+        var imageDeduplicator = new ImageDeduplicator(PROCESSOR.algorithm, new SimpleImageProvider(), bin);
         var orchestrator = new Orchestrator(imageDeduplicator, new GUIDirectoryOpener());
 
         try {

@@ -130,6 +130,11 @@ public record StubImage(Path path, String name, Pixels pixelContent, String form
                     .withPixels(Pixels.CAT);
         }
 
+
+        public String name() {
+            return name;
+        }
+
     }
 
 }
