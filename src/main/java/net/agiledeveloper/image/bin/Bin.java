@@ -39,6 +39,32 @@ public class Bin {
         }
     }
 
+    public List<Path> directories() throws BinException {
+        File[] files = root().toFile().listFiles(File::isDirectory);
+        return files == null ? emptyList() : stream(files).map(File::toPath).toList();
+    }
+
+    public void clear() throws BinException {
+        try {
+            Files.walkFileTree(root(), new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException cause) {
+            throw new BinException(cause);
+        }
+    }
+
+
     private void tryExecuting(Action action, Collection<Path> files) throws IOException {
         var currentBinDirectory = pathProvider.currentBin();
         createDirectory(currentBinDirectory);
@@ -65,31 +91,6 @@ public class Bin {
             throw new IOException("Failed to create directory: " + root().toAbsolutePath());
         }
         Files.createDirectories(directoryPath);
-    }
-
-    public List<Path> directories() {
-        File[] files = root().toFile().listFiles(File::isDirectory);
-        return files == null ? emptyList() : stream(files).map(File::toPath).toList();
-    }
-
-    public void clear() {
-        try {
-            Files.walkFileTree(root(), new SimpleFileVisitor<>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (IOException cause) {
-            throw new BinException(cause);
-        }
     }
 
 
