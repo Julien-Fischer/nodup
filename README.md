@@ -45,7 +45,11 @@ Flags:
   -m, --move       Move files in the directory.
   -s, --scan       Scan the directory and display file information.
   -h, --help       Print this help message and exit
-  --bin            Open the bin directory (requires a GUI environment)
+  bin            
+      --list       List all bin directories
+      --path       Print bin path
+      --clear      Delete all bin directories
+      --open       Open the bin directory (requires a GUI environment)
 ```
 
 
