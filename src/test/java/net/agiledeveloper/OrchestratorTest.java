@@ -14,21 +14,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import static java.lang.String.format;
 import static java.lang.String.join;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -335,6 +330,18 @@ class OrchestratorTest {
             return pathProvider.currentBin();
         }
 
+        public void toHaveDirectories(int expected) {
+            File[] directories = pathProvider.root().toFile().listFiles(File::isDirectory);
+            int actual = directories == null ? 0 : directories.length;
+            if (actual != expected) {
+                throw new AssertionError(format(
+                        "Expected %s directories but got %s %s",
+                        expected, actual, Arrays.toString(directories)
+                ));
+            }
+            assertThat(directories).hasSize(expected);
+        }
+
     }
 
     private record TextFile(Path parentDirectory, Path path) {
@@ -603,14 +610,13 @@ class OrchestratorTest {
 
         @Override
         public Path root() {
-            return Paths.get("bin");
+            return parentDirectory.resolve("bin");
         }
 
         @Override
         public Path currentBin() {
-            return parentDirectory.resolve(root());
+            return root().resolve("current");
         }
-
     }
 
 }

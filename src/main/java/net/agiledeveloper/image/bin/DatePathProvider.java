@@ -24,7 +24,7 @@ public class DatePathProvider implements PathProvider {
 
     @Override
     public Path currentBin() {
-        return BIN_ROOT.resolve(LocalDateTime.now().format(DATE_TIME_FORMATTER));
+        return root().resolve(LocalDateTime.now().format(DATE_TIME_FORMATTER));
     }
 
 }

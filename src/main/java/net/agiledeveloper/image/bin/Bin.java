@@ -2,7 +2,6 @@ package net.agiledeveloper.image.bin;
 
 import net.agiledeveloper.App.Action;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,10 +49,8 @@ public class Bin {
     }
 
     private void createDirectory(Path directoryPath) throws IOException {
-        String userHome = System.getProperty("user.home");
-        var newDir = new File(userHome, root().toString());
-        if (!newDir.exists() && !newDir.mkdirs()) {
-            throw new IOException("Failed to create directory: " + newDir.getAbsolutePath());
+        if (!root().toFile().mkdirs()) {
+            throw new IOException("Failed to create directory: " + root().toAbsolutePath());
         }
         Files.createDirectories(directoryPath);
     }
@@ -64,6 +61,7 @@ public class Bin {
         Path root();
 
         Path currentBin();
+
     }
 
 }
