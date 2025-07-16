@@ -276,10 +276,7 @@ class OrchestratorTest {
 
     @Test
     void bins_lists_bin_directories() throws IOException {
-        givenThat(aDogImage()).hasDuplicates(1);
-
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--copy");
+        havingBinDirectories(1);
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--bins");
@@ -287,6 +284,23 @@ class OrchestratorTest {
         expectStdout()
                 .toContain("Bins: 1")
                 .toMatch("- /bin/current", compile("^- .*/bin/current$"));
+    }
+
+    @Test
+    void clear_deletes_all_bin_directories() throws IOException {
+        havingBinDirectories(2);
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--clear");
+
+        expect(bin).toBeEmpty();
+    }
+
+
+    private void havingBinDirectories(int count) throws IOException {
+        givenThat(aDogImage()).hasDuplicates(count);
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--copy");
     }
 
     private ImageDuplication givenThat(ImageBuilder image) {

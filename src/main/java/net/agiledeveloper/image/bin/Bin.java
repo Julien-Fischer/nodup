@@ -4,9 +4,8 @@ import net.agiledeveloper.App.Action;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.List;
 
@@ -64,12 +63,44 @@ public class Bin {
         return files == null ? emptyList() : stream(files).map(File::toPath).toList();
     }
 
+    public void clear() {
+        try {
+            Files.walkFileTree(root(), new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException cause) {
+            throw new BinException(cause);
+        }
+    }
+
 
     public interface PathProvider {
 
         Path root();
 
         Path currentBin();
+
+    }
+
+    public static class BinException extends RuntimeException {
+
+        public BinException(String message) {
+            super(message);
+        }
+
+        public BinException(Throwable cause) {
+            super(cause);
+        }
 
     }
 

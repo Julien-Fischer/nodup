@@ -34,10 +34,16 @@ public class Orchestrator {
             openBin();
         } else if (isListBinDirectories(args)) {
             listBinDirectories();
+        } else if (isClearBin(args)) {
+            imageDeduplicator.bin().clear();
         } else {
             parseArguments(args);
             processCommand(args);
         }
+    }
+
+    private boolean isClearBin(String[] arguments) {
+        return asList(arguments).contains("--clear");
     }
 
     @SuppressWarnings("java:S106")
@@ -132,7 +138,7 @@ Flags:
 
     private static Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
         String[] supported = {
-                "--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log", "--bin", "--bins"
+                "--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log", "--bin", "--bins", "--clear"
         };
         for (int i = 0; i < arguments.length; i++) {
             String argument = arguments[i];
