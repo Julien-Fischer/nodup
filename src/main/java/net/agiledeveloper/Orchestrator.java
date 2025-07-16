@@ -5,6 +5,7 @@ import net.agiledeveloper.image.ImageDeduplicator;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,12 +30,25 @@ public class Orchestrator {
     public void execute(String[] args) {
         if (isHelpRequest(args)) {
             printHelp();
-        } else if(isOpenBinRequest(args)) {
+        } else if (isOpenBinRequest(args)) {
             openBin();
+        } else if (isListBinDirectories(args)) {
+            listBinDirectories();
         } else {
             parseArguments(args);
             processCommand(args);
         }
+    }
+
+    @SuppressWarnings("java:S106")
+    private void listBinDirectories() {
+        List<Path> directories = imageDeduplicator.bin().directories();
+        System.out.println("Bins: " + directories.size());
+        directories.forEach(directory -> System.out.println("- " + directory.toAbsolutePath()));
+    }
+
+    private boolean isListBinDirectories(String[] arguments) {
+        return asList(arguments).contains("--bins");
     }
 
     private void processCommand(String[] args) {
@@ -61,7 +75,7 @@ public class Orchestrator {
     }
 
     private void openBin() {
-        directoryOpener.open(imageDeduplicator.binRoot());
+        directoryOpener.open(imageDeduplicator.bin().root());
     }
 
     private static boolean isHelpRequest(String[] args) {
@@ -117,7 +131,9 @@ Flags:
     }
 
     private static Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
-        String[] supported = {"--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log", "--bin"};
+        String[] supported = {
+                "--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log", "--bin", "--bins"
+        };
         for (int i = 0; i < arguments.length; i++) {
             String argument = arguments[i];
             if (i == 0 && !argument.startsWith("-")) {

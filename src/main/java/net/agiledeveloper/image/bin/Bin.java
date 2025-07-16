@@ -2,12 +2,16 @@ package net.agiledeveloper.image.bin;
 
 import net.agiledeveloper.App.Action;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Collection;
+import java.util.List;
 
+import static java.util.Arrays.stream;
+import static java.util.Collections.emptyList;
 import static net.agiledeveloper.App.Action.SCAN;
 import static net.agiledeveloper.App.logger;
 
@@ -53,6 +57,11 @@ public class Bin {
             throw new IOException("Failed to create directory: " + root().toAbsolutePath());
         }
         Files.createDirectories(directoryPath);
+    }
+
+    public List<Path> directories() {
+        File[] files = root().toFile().listFiles(File::isDirectory);
+        return files == null ? emptyList() : stream(files).map(File::toPath).toList();
     }
 
 

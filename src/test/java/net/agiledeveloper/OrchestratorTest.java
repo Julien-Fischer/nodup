@@ -22,9 +22,11 @@ import java.util.*;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static java.util.regex.Pattern.compile;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -272,6 +274,20 @@ class OrchestratorTest {
         expect(bin).toBeEmpty();
     }
 
+    @Test
+    void bins_lists_bin_directories() throws IOException {
+        givenThat(aDogImage()).hasDuplicates(1);
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--copy");
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--bins");
+
+        expectStdout()
+                .toContain("Bins: 1")
+                .toMatch("- /bin/current", compile("^- .*/bin/current$"));
+    }
 
     private ImageDuplication givenThat(ImageBuilder image) {
         return new ImageDuplication(image);
@@ -426,6 +442,14 @@ class OrchestratorTest {
             return this;
         }
 
+        public void toMatch(String subject, Pattern pattern) {
+            if (!pattern.matcher(subject).matches()) {
+                throw new AssertionError(format(
+                        "Subject %s does not match pattern %s",
+                        subject, pattern.pattern()
+                ));
+            }
+        }
     }
 
     private LogAssertion expectLog() {

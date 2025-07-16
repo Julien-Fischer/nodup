@@ -60,8 +60,8 @@ public class ImageDeduplicator {
         }
     }
 
-    public Path binRoot() {
-        return bin.root();
+    public Bin bin() {
+        return bin;
     }
 
     private void logDurationSince(long start) {
