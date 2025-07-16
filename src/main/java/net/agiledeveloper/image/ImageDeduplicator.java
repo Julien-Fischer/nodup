@@ -2,10 +2,10 @@ package net.agiledeveloper.image;
 
 import net.agiledeveloper.App.Action;
 import net.agiledeveloper.image.bin.Bin;
+import net.agiledeveloper.image.bin.Bin.BinException;
 import net.agiledeveloper.image.processors.ImageProcessor;
 import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
@@ -49,13 +49,13 @@ public class ImageDeduplicator {
     }
 
     private void processDuplicates(Action action, Collection<Collision> collisions) {
+        logSeparator();
+        Collection<Path> duplicates = collisions.stream()
+                .map(collision -> collision.a().path())
+                .toList();
         try {
-            logSeparator();
-            Collection<Path> duplicates = collisions.stream()
-                    .map(collision -> collision.a().path())
-                    .toList();
             bin.accept(action, duplicates);
-        } catch (IOException exception) {
+        } catch (BinException exception) {
             logger.severe("Could not %s duplicates. Cause: %s".formatted(action, exception.getMessage()));
         }
     }

@@ -4,6 +4,7 @@ import net.agiledeveloper.App.Action;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.BindException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
@@ -28,18 +29,26 @@ public class Bin {
         return pathProvider.root();
     }
 
-    public void accept(Action action, Collection<Path> files) throws IOException {
+    public void accept(Action action, Collection<Path> files) throws BinException {
         if (action != SCAN) {
-            var currentBinDirectory = pathProvider.currentBin();
-            createDirectory(currentBinDirectory);
-            logger.info(() -> "About to [%s] %s duplicates to %s:".formatted(action, files.size(), currentBinDirectory));
-            for (var sourcePath : files) {
-                Path targetPath = currentBinDirectory.resolve(sourcePath.getFileName());
-                performAction(action, sourcePath, targetPath);
-                logger.fine(() -> "File moved to: " + targetPath);
+            try {
+                tryExecuting(action, files);
+            } catch (IOException cause) {
+                throw new BinException(cause);
             }
-            logger.info(() -> "Done [%s] %s duplicates to %s:".formatted(action, files.size(), currentBinDirectory));
         }
+    }
+
+    private void tryExecuting(Action action, Collection<Path> files) throws IOException {
+        var currentBinDirectory = pathProvider.currentBin();
+        createDirectory(currentBinDirectory);
+        logger.info(() -> "About to [%s] %s duplicates to %s:".formatted(action, files.size(), currentBinDirectory));
+        for (var sourcePath : files) {
+            Path targetPath = currentBinDirectory.resolve(sourcePath.getFileName());
+            performAction(action, sourcePath, targetPath);
+            logger.fine(() -> "File moved to: " + targetPath);
+        }
+        logger.info(() -> "Done [%s] %s duplicates to %s:".formatted(action, files.size(), currentBinDirectory));
     }
 
 
@@ -47,7 +56,7 @@ public class Bin {
         switch (action) {
             case MOVE -> Files.move(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             case COPY -> Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
-            default -> throw new IllegalArgumentException("Unsupported action: " + action);
+            default -> throw new BindException("Unsupported action: " + action);
         }
     }
 
@@ -93,10 +102,6 @@ public class Bin {
     }
 
     public static class BinException extends RuntimeException {
-
-        public BinException(String message) {
-            super(message);
-        }
 
         public BinException(Throwable cause) {
             super(cause);
