@@ -296,6 +296,15 @@ class OrchestratorTest {
         expect(bin).toBeEmpty();
     }
 
+    @Test
+    void show_prints_bin_path() {
+        whenStartingApp()
+                .withParameters("bin", "--path");
+
+        expectStdout()
+                .toContain("/bin");
+    }
+
 
     private void havingBinDirectories(int count) throws IOException {
         givenThat(aDogImage()).hasDuplicates(count);

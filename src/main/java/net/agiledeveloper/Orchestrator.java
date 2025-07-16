@@ -45,9 +45,20 @@ public class Orchestrator {
             listBinDirectories();
         } else if (isClearBin(arguments)) {
             imageDeduplicator.bin().clear();
+        } else if (isPrintBinPathRequest(arguments)) {
+            printBinPath();
         } else {
             printHelp();
         }
+    }
+
+    @SuppressWarnings("java:S106")
+    private void printBinPath() {
+        System.out.println(imageDeduplicator.bin().root());
+    }
+
+    private boolean isPrintBinPathRequest(String[] arguments) {
+        return asList(arguments).contains("--path");
     }
 
     private boolean isBinCommand(String[] arguments) {
@@ -155,7 +166,7 @@ Flags:
                 "--copy", "-c",
                 "--move", "-m",
                 "--log",
-                "bin", "--open", "--list", "--clear"
+                "bin", "--open", "--list", "--clear", "--path"
         };
         for (int i = 0; i < arguments.length; i++) {
             String argument = arguments[i];
