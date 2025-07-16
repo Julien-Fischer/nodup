@@ -210,7 +210,7 @@ class OrchestratorTest {
     @Test
     void it_opens_bin_directory() {
         whenStartingApp()
-                .withParameters("--bin");
+                .withParameters("bin", "--open");
 
         expect(directoryOpener)
                 .toHaveOpened(bin.root());
@@ -279,7 +279,7 @@ class OrchestratorTest {
         havingBinDirectories(1);
 
         whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--bins");
+                .withParameters(directoryToScan.toString(), "bin", "--list");
 
         expectStdout()
                 .toContain("Bins: 1")
@@ -291,7 +291,7 @@ class OrchestratorTest {
         havingBinDirectories(2);
 
         whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--clear");
+                .withParameters(directoryToScan.toString(), "bin", "--clear");
 
         expect(bin).toBeEmpty();
     }

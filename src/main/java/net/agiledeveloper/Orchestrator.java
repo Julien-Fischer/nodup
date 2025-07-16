@@ -30,16 +30,28 @@ public class Orchestrator {
     public void execute(String[] args) {
         if (isHelpRequest(args)) {
             printHelp();
-        } else if (isOpenBinRequest(args)) {
-            openBin();
-        } else if (isListBinDirectories(args)) {
-            listBinDirectories();
-        } else if (isClearBin(args)) {
-            imageDeduplicator.bin().clear();
+        } else if (isBinCommand(args)) {
+            processBin(args);
         } else {
             parseArguments(args);
             processCommand(args);
         }
+    }
+
+    private void processBin(String[] arguments) {
+        if (isOpenBinRequest(arguments)) {
+            openBin();
+        } else if (isListBinDirectories(arguments)) {
+            listBinDirectories();
+        } else if (isClearBin(arguments)) {
+            imageDeduplicator.bin().clear();
+        } else {
+            printHelp();
+        }
+    }
+
+    private boolean isBinCommand(String[] arguments) {
+        return asList(arguments).contains("bin");
     }
 
     private boolean isClearBin(String[] arguments) {
@@ -54,7 +66,7 @@ public class Orchestrator {
     }
 
     private boolean isListBinDirectories(String[] arguments) {
-        return asList(arguments).contains("--bins");
+        return asList(arguments).contains("--list");
     }
 
     private void processCommand(String[] args) {
@@ -77,7 +89,7 @@ public class Orchestrator {
     }
 
     private static boolean isOpenBinRequest(String[] arguments) {
-        return asList(arguments).contains("--bin");
+        return asList(arguments).contains("--open");
     }
 
     private void openBin() {
@@ -138,7 +150,12 @@ Flags:
 
     private static Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
         String[] supported = {
-                "--help", "-h", "--scan", "-s", "--copy", "-c", "--move", "-m", "--log", "--bin", "--bins", "--clear"
+                "--help", "-h",
+                "--scan", "-s",
+                "--copy", "-c",
+                "--move", "-m",
+                "--log",
+                "bin", "--open", "--list", "--clear"
         };
         for (int i = 0; i < arguments.length; i++) {
             String argument = arguments[i];
