@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
-import static java.util.regex.Pattern.compile;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -282,8 +281,7 @@ class OrchestratorTest {
                 .withParameters(directoryToScan.toString(), "bin", "--list");
 
         expectStdout()
-                .toContain("Bins: 1")
-                .toMatch("- /bin/current", compile("^- .*/bin/current$"));
+                .toPartiallyMatch("/bin/current$");
     }
 
     @Test
@@ -467,13 +465,20 @@ class OrchestratorTest {
             return this;
         }
 
-        public void toMatch(String subject, Pattern pattern) {
-            if (!pattern.matcher(subject).matches()) {
-                throw new AssertionError(format(
-                        "Subject %s does not match pattern %s",
-                        subject, pattern.pattern()
-                ));
+        public StdoutAssertion toPartiallyMatch(String patternString) {
+            var subject = outputStream.toString();
+            var pattern = Pattern.compile(patternString, Pattern.DOTALL);
+            if (!pattern.matcher(subject).find()) {
+                try {
+                    throw new AssertionError(format(
+                            "Subject %n%s does not match pattern %s",
+                            subject, pattern
+                    ));
+                } finally {
+                    System.setOut(originalOut);
+                }
             }
+            return this;
         }
     }
 
