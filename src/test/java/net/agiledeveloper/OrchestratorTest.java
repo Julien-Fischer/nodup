@@ -347,10 +347,12 @@ class OrchestratorTest {
     private record BinAssertion(PathProvider pathProvider, Bin bin) {
 
         public void toBeEmpty() {
+            assertThat(bin.isEmpty()).isTrue();
             assertThat(Files.exists(currentBin())).isFalse();
         }
 
         public void toNotBeEmpty() {
+            assertThat(bin.isEmpty()).isFalse();
             assertThat(Files.exists(currentBin())).isTrue();
         }
 

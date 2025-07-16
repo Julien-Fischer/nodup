@@ -44,6 +44,10 @@ public class Bin {
         return files == null ? emptyList() : stream(files).map(File::toPath).toList();
     }
 
+    public boolean isEmpty() throws BinException {
+        return directories().isEmpty();
+    }
+
     public void clear() throws BinException {
         try {
             Files.walkFileTree(root(), new SimpleFileVisitor<>() {
