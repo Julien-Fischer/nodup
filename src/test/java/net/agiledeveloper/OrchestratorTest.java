@@ -72,7 +72,7 @@ class OrchestratorTest {
 
 
     @Test
-    void it_uses_the_current_directory_by_default() throws IOException {
+    void use_current_directory_by_default() throws IOException {
         havingDirectoryNamed("directory");
 
         whenStartingApp()
@@ -152,7 +152,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void it_uses_default_log_level() throws IOException {
+    void use_default_log_level() throws IOException {
         havingDirectoryNamed("directory");
 
         whenStartingApp()
@@ -163,7 +163,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void it_uses_specified_log_level() throws IOException {
+    void use_specified_log_level() throws IOException {
         havingDirectoryNamed("directory");
 
         whenStartingApp()
@@ -174,7 +174,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void it_uses_specified_log_level_when_no_positional_parameters() throws IOException {
+    void use_specified_log_level_when_no_positional_parameters() throws IOException {
         havingDirectoryNamed("directory");
 
         whenStartingApp()
@@ -186,7 +186,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void it_prints_an_help_message() {
+    void print_an_help_message() {
         whenStartingApp()
                 .withParameters("--help");
 
@@ -207,7 +207,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void it_opens_bin_directory() {
+    void open_bin_directory() {
         whenStartingApp()
                 .withParameters("bin", "--open");
 
@@ -262,7 +262,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void do_create_bin_directory_on_duplicate_scan() throws IOException {
+    void create_bin_directory_on_duplicate_scan() throws IOException {
         givenThat(aDogImage()).hasDuplicates(1);
 
         expect(bin).toBeEmpty();
@@ -274,7 +274,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void bins_lists_bin_directories() throws IOException {
+    void list_bin_directories() throws IOException {
         havingBinDirectories(1);
 
         whenStartingApp()
