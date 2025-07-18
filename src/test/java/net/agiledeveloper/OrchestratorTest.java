@@ -295,7 +295,7 @@ class OrchestratorTest {
     }
 
     @Test
-    void show_prints_bin_path() {
+    void bin_path_prints_bin_path() {
         whenStartingApp()
                 .withParameters("bin", "--path");
 
