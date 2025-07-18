@@ -191,12 +191,7 @@ class OrchestratorTest {
                 .withParameters("--help");
 
         expectStdout()
-                .toContain("nodup [/path/to/dir] [OPTIONS]")
-                .toContain("Positional parameters:")
-                .toContain("$1               (Optional) The path to the directory to process")
-                .toContain("Options:")
-                .toContain("--log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).")
-                .toContain("Flags:");
+                .toContainHelpMessage();
     }
 
     @Test
@@ -301,6 +296,15 @@ class OrchestratorTest {
 
         expectStdout()
                 .toContain("/bin");
+    }
+
+    @Test
+    void bin_prints_bin_path() {
+        whenStartingApp()
+                .withParameters("bin");
+
+        expectStdout()
+                .toContainHelpMessage();
     }
 
 
@@ -479,6 +483,16 @@ class OrchestratorTest {
                 }
             }
             return this;
+        }
+
+        public void toContainHelpMessage() {
+            new StdoutAssertion(outputStream, originalOut)
+                    .toContain("nodup [/path/to/dir] [OPTIONS]")
+                    .toContain("Positional parameters:")
+                    .toContain("$1               (Optional) The path to the directory to process")
+                    .toContain("Options:")
+                    .toContain("--log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).")
+                    .toContain("Flags:");
         }
     }
 
