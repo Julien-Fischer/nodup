@@ -99,7 +99,7 @@ class OrchestratorTest {
                 .containing(aBigDog(), aDog(), aCat());
 
         whenStartingApp()
-                .withParameters(directoryToScan.toString());
+                .withParameters(directoryToScan.toString(), "--log=fine");
 
         assertThatFilesWereFound(3);
         assertThatNoDuplicatesWereFound();

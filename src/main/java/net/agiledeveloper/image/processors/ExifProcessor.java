@@ -93,7 +93,7 @@ public class ExifProcessor extends BruteForceProcessor {
                 imagesByDiscriminator.putIfAbsent(key, new ArrayList<>());
                 imagesByDiscriminator.get(key).add(image);
             } catch (Image.ReadException exception) {
-                logger.info("Ignoring %s: not an image file".formatted(image.path()));
+                logger.fine("Ignoring %s: not an image file".formatted(image.path()));
             }
         }
         return imagesByDiscriminator.entrySet().stream();
@@ -106,7 +106,7 @@ public class ExifProcessor extends BruteForceProcessor {
     private Consumer<Entry<Discriminator, Integer>> printBucket() {
         return entry -> {
             var stringBuilder = new StringBuilder();
-            logger.fine(() -> stringBuilder
+            logger.finer(() -> stringBuilder
                     .append("    ")
                     .append(entry.getValue())
                     .append(": ")

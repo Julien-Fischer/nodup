@@ -27,13 +27,13 @@ public class BruteForceProcessor implements ImageProcessor {
         int i = 0;
         int size = images.size();
         for (var image : images) {
-            logger.finer(() -> "-".repeat(40));
-            logger.finer(printProgress(i, size));
-            logger.finer(() -> "-".repeat(40));
-            logger.finer(image::toString);
+            logger.finest(() -> "-".repeat(40));
+            logger.finest(printProgress(i, size));
+            logger.finest(() -> "-".repeat(40));
+            logger.finest(image::toString);
             if (read.contains(image)) continue;
             for (var other : images) {
-                logger.finer(() -> "    " + other);
+                logger.finest(() -> "    " + other);
                 if (!image.hasSize(other) || read.contains(other) || image == other) continue;
                 if (collisionDetector.collides(image, other)) {
                     read.add(other);
