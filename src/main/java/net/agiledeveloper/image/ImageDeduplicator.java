@@ -75,7 +75,7 @@ public class ImageDeduplicator {
     }
 
     private void logImages(Path directory, Image[] images) {
-        logger.info(() -> "Found %s images in %s".formatted(images.length, directory));
+        logger.info(() -> "Found %s (potential) images in %s".formatted(images.length, directory));
     }
 
     private void logCollisions(Collection<Collision> collisions) {

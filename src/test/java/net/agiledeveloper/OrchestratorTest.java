@@ -443,7 +443,7 @@ class OrchestratorTest {
 
     private void assertThatFilesWereFound(int count) {
         expectLog()
-                .toContain("Found %s images in %s".formatted(count, directoryToScan));
+                .toContain("Found %s (potential) images in %s".formatted(count, directoryToScan));
     }
 
     private void assertThatNoFilesWereFound() {
