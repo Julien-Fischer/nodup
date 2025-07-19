@@ -33,9 +33,11 @@ public class ImageDeduplicator {
         long start = System.nanoTime();
 
         logSeparator();
+        logger.info("Scanning directory...");
         Image[] images = imageProvider.imagesAt(directory);
         logImages(directory, images);
 
+        logger.info("Checking for duplicates...");
         Collection<Collision> collisions = imageProcessor.detectCollisions(images);
 
         logSeparator();
