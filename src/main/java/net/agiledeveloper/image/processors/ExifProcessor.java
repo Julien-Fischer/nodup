@@ -44,9 +44,10 @@ public class ExifProcessor extends BruteForceProcessor {
                 .parallelStream()
                 .flatMap(entry -> {
                     int progressIndex = processedImages.getAndAdd(entry.getValue().count);
-                    var progress = printProgress(progressIndex, total, "Potential collision");
+                    double progress = (double) progressIndex / total * 100;
                     var stringBuilder = new StringBuilder();
-                    logger.info(() -> "%s: %s".formatted(progress, printPotentialCollision(stringBuilder, entry)));
+                    logger.info(() -> String.format("%05.2f%%", progress));
+                    logger.info(() -> printPotentialCollision(stringBuilder, entry).toString());
                     return findCollisions(entry.getValue());
                 })
                 .toList();

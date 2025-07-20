@@ -9,13 +9,11 @@ import net.agiledeveloper.image.processors.ImageProcessor.Collision;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import static net.agiledeveloper.App.Action.SCAN;
+import static net.agiledeveloper.App.logger;
 
 public class ImageDeduplicator {
-
-    private final Logger logger = Logger.getLogger(getClass().getSimpleName());
 
     private final ImageProcessor imageProcessor;
     private final ImageProvider imageProvider;
@@ -82,7 +80,7 @@ public class ImageDeduplicator {
 
     private void logCollisions(Collection<Collision> collisions) {
         logger.info(() -> "Found %s collisions:".formatted(collisions.size()));
-        collisions.forEach(collision -> logger.info(collision.toString()));
+        collisions.forEach(collision -> logger.fine(collision.toString()));
     }
 
 }

@@ -113,7 +113,7 @@ class OrchestratorTest {
                 .containing(aBigDog(), a, b, aCat());
 
         whenStartingApp()
-                .withParameters(directoryToScan.toString());
+                .withParameters(directoryToScan.toString(), "--log=finer");
 
         assertThatDuplicatesWereFound(1)
                 .forImages(a, b);
