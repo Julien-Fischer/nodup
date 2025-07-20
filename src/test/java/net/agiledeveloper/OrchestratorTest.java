@@ -152,6 +152,22 @@ class OrchestratorTest {
     }
 
     @Test
+    void multiple_collisions_are_supported() throws IOException {
+        havingDirectoryToScan("directory");
+        var a = aDogImage().located(directoryToScan).named("dog-a").build();
+        var b = aDogImage().located(directoryToScan).named("dog-b").build();
+        var c = aDogImage().located(directoryToScan).named("dog-c").build();
+        givenThat(directoryToScan)
+                .contains(aBigDog(), a, b, c, aCat());
+
+        whenStartingApp()
+                .withParameters(directoryToScan.toString(), "--copy");
+
+        assertThatDuplicatesWereCopied(2)
+                .forImages(a, b);
+    }
+
+    @Test
     void use_default_log_level() throws IOException {
         havingDirectoryNamed("directory");
 
@@ -234,26 +250,34 @@ class OrchestratorTest {
 
     @Test
     void only_create_bin_directory_on_duplicate_copy() throws IOException {
-        givenThat(aDogImage()).hasDuplicates(1);
+        havingDirectoryToScan("directory");
+        var a = aDogImage().located(directoryToScan).named("dog-a").build();
+        var b = aDogImage().located(directoryToScan).named("dog-b").build();
+        givenThat(directoryToScan)
+                .contains(a, b);
 
         expect(bin).toBeEmpty();
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--copy");
 
-        expect(bin).toContain(aDogImage());
+        expect(bin).toContain(b);
     }
 
     @Test
     void only_create_bin_directory_on_duplicate_move() throws IOException {
-        givenThat(aDogImage()).hasDuplicates(1);
+        havingDirectoryToScan("directory");
+        var a = aDogImage().located(directoryToScan).named("dog-a").build();
+        var b = aDogImage().located(directoryToScan).named("dog-b").build();
+        givenThat(directoryToScan)
+                .contains(a, b);
 
         expect(bin).toBeEmpty();
 
         whenStartingApp()
                 .withParameters(directoryToScan.toString(), "--move");
 
-        expect(bin).toContain(aDogImage());
+        expect(bin).toContain(b);
     }
 
     @Test
@@ -358,12 +382,17 @@ class OrchestratorTest {
             assertThat(Files.exists(currentBin())).isTrue();
         }
 
-        public void toContain(ImageBuilder image) {
+        public void toContain(Image image) {
             try (var stream = Files.list(currentBin())) {
-                boolean contains = stream
-                        .filter(Files::isRegularFile)
-                        .anyMatch(p -> p.getFileName().equals(image.build().path().getFileName()));
-                assertThat(contains).isTrue();
+                var list = stream.filter(Files::isRegularFile).toList();
+                boolean contains = list.stream()
+                        .anyMatch(p -> p.getFileName().equals(image.path().getFileName()));
+                assertThat(contains)
+                        .withFailMessage(format(
+                                "Current bin does not contain %s. Content: %s elements: %s",
+                                image.path(), list.size(), list
+                        ))
+                        .isTrue();
             } catch (IOException cause) {
                 throw new RuntimeException("listFiles failed: " + cause, cause);
             }
@@ -635,7 +664,7 @@ class OrchestratorTest {
             var bName = b.path().getFileName().toString();
             expectLog()
                     .toContain("Collision %s".formatted(aName))
-                    .toContain("vs %s".formatted(bName));
+                    .toContain("vs [%s]".formatted(bName));
         }
 
     }

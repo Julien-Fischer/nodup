@@ -4,7 +4,12 @@ import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.processors.collision.CollisionDetector;
 
-import java.util.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class BruteForceProcessor implements ImageProcessor {
@@ -20,29 +25,57 @@ public class BruteForceProcessor implements ImageProcessor {
     }
 
 
+    private static String hash(Image image) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            int[] pixels = image.pixels();
+
+            var buffer = ByteBuffer.allocate(4 * pixels.length);
+            for (int pixel : pixels) {
+                buffer.putInt(pixel);
+            }
+            byte[] imageData = buffer.array();
+
+            md.update(imageData);
+            byte[] hashBytes = md.digest();
+
+            var hex = new StringBuilder();
+            for (byte b : hashBytes) {
+                hex.append(String.format("%02x", b));
+            }
+            return hex.toString();
+//            return new String(hashBytes);
+
+        } catch (NoSuchAlgorithmException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {
-        Set<Image> read = new HashSet<>();
-        List<Collision> results = new ArrayList<>();
         int i = 0;
         int size = images.size();
+        var map = new HashMap<String, Collision>();
+
         for (var image : images) {
+            var hash = hash(image);
             logger.finest(() -> "-".repeat(40));
             logger.finest(printProgress(i, size));
             logger.finest(() -> "-".repeat(40));
-            logger.finest(image::toString);
-            if (read.contains(image)) continue;
-            for (var other : images) {
-                logger.finest(() -> "    " + other);
-                if (!image.hasSize(other) || read.contains(other) || image == other) continue;
-                if (collisionDetector.collides(image, other)) {
-                    read.add(other);
-                    results.add(new Collision(image, other));
-                }
+            logger.finest(() -> "    " + hash + " | " + image);
+            if (map.containsKey(hash)) {
+                map.get(hash).add(image);
+            } else {
+                map.put(hash, new Collision(image));
             }
             i++;
         }
-        return results;
+
+        return map.values().stream()
+                .filter(collision -> !collision.duplicates().isEmpty())
+                .toList();
     }
 
     protected static String printProgress(int i, int n) {

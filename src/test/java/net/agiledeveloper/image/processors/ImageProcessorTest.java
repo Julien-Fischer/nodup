@@ -78,11 +78,11 @@ public abstract class ImageProcessorTest {
 
     private record CollisionAssertion(Collection<Collision> collisions) {
 
-        public CollisionAssertion toBe(Image a, Image b) {
+        public CollisionAssertion toBe(Image original, Image... duplicates) {
             Optional<Collision> optionalCollision = collisions.stream().findFirst();
             var collision = optionalCollision.orElseThrow();
-            assertThat(collision.a()).isEqualTo(a);
-            assertThat(collision.b()).isEqualTo(b);
+            assertThat(collision.contains(original)).isTrue();
+            assertThat(collision.contains(duplicates)).isTrue();
             return this;
         }
 

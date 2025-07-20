@@ -51,7 +51,7 @@ public class ImageDeduplicator {
     private void processDuplicates(Action action, Collection<Collision> collisions) {
         logSeparator();
         Collection<Path> duplicates = collisions.stream()
-                .map(collision -> collision.a().path())
+                .flatMap(collision -> collision.duplicates().stream().map(Image::path))
                 .toList();
         try {
             bin.accept(action, duplicates);
