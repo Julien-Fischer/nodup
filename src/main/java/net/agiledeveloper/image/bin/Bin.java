@@ -71,7 +71,7 @@ public class Bin {
 
     private void tryExecuting(Action action, Collection<Path> files) throws IOException {
         var currentBinDirectory = pathProvider.currentBin();
-        createDirectory(currentBinDirectory);
+        Files.createDirectories(currentBinDirectory);
         logger.info(() -> "About to [%s] %s duplicates to %s:".formatted(action, files.size(), currentBinDirectory));
         for (var sourcePath : files) {
             Path targetPath = currentBinDirectory.resolve(sourcePath.getFileName());
@@ -88,13 +88,6 @@ public class Bin {
             case COPY -> Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
             default -> throw new BindException("Unsupported action: " + action);
         }
-    }
-
-    private void createDirectory(Path directoryPath) throws IOException {
-        if (!root().toFile().mkdirs()) {
-            throw new IOException("Failed to create directory: " + root().toAbsolutePath());
-        }
-        Files.createDirectories(directoryPath);
     }
 
 
