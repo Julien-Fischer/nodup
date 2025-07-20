@@ -2,6 +2,8 @@ package net.agiledeveloper.image;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public interface Image {
 
@@ -25,6 +27,31 @@ public interface Image {
         return other.dimension().equals(dimension());
     }
 
+    default String hash() {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            int[] pixels = pixels();
+
+            for (int pixel : pixels) {
+                md.update((byte) (pixel >>> 24));
+                md.update((byte) (pixel >>> 16));
+                md.update((byte) (pixel >>> 8));
+                md.update((byte) pixel);
+            }
+
+            return toHexadecimal(md.digest()).toString();
+        } catch (NoSuchAlgorithmException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static StringBuilder toHexadecimal(byte[] hashBytes) {
+        var hex = new StringBuilder();
+        for (byte b : hashBytes) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex;
+    }
 
     record Dimension(int width, int height) {
 

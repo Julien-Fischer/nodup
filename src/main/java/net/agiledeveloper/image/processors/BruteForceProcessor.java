@@ -4,9 +4,6 @@ import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.processors.collision.CollisionDetector;
 
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,33 +22,6 @@ public class BruteForceProcessor implements ImageProcessor {
     }
 
 
-    private static String hash(Image image) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            int[] pixels = image.pixels();
-
-            for (int pixel : pixels) {
-                md.update((byte) (pixel >>> 24));
-                md.update((byte) (pixel >>> 16));
-                md.update((byte) (pixel >>> 8));
-                md.update((byte) pixel);
-            }
-
-            return toHexadecimal(md.digest()).toString();
-        } catch (NoSuchAlgorithmException | IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static StringBuilder toHexadecimal(byte[] hashBytes) {
-        var hex = new StringBuilder();
-        for (byte b : hashBytes) {
-            hex.append(String.format("%02x", b));
-        }
-        return hex;
-    }
-
-
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {
         var filesProcessed = new AtomicInteger(0);
@@ -59,7 +29,7 @@ public class BruteForceProcessor implements ImageProcessor {
         var map = new HashMap<String, Collision>();
 
         for (var image : images) {
-            var hash = hash(image);
+            var hash = image.hash();
             logger.finest(() -> "-".repeat(40));
             logger.finest(() -> printProgress(filesProcessed.incrementAndGet(), size));
             logger.finest(() -> "-".repeat(40));

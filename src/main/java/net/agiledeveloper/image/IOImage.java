@@ -11,7 +11,7 @@ import java.util.Iterator;
 public class IOImage implements Image {
 
     private final Path path;
-    private int[] pixels;
+    private String hash;
     private Dimension dimension;
     private String format;
     private Long weight;
@@ -19,6 +19,11 @@ public class IOImage implements Image {
 
     public IOImage(Path path) {
         this.path = path;
+    }
+
+    @Override
+    public String hash() {
+        return hash;
     }
 
     @Override
@@ -53,11 +58,9 @@ public class IOImage implements Image {
 
     @Override
     public int[] pixels() throws IOException {
-        if (pixels == null) {
-            BufferedImage image = ImageIO.read(path.toFile());
-            pixels = new int[width() * height()];
-            image.getRGB(0, 0, width(), height(), pixels, 0, width());
-        }
+        BufferedImage image = ImageIO.read(path.toFile());
+        var pixels = new int[width() * height()];
+        image.getRGB(0, 0, width(), height(), pixels, 0, width());
         return pixels;
     }
 
