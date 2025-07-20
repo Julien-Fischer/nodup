@@ -47,7 +47,7 @@ public class ExifProcessor extends BruteForceProcessor {
                     double progress = (double) progressIndex / total * 100;
                     var stringBuilder = new StringBuilder();
                     logger.info(() -> String.format("%05.2f%%", progress));
-                    logger.info(() -> printPotentialCollision(stringBuilder, entry).toString());
+                    logger.fine(() -> printPotentialCollision(stringBuilder, entry).toString());
                     return findCollisions(entry.getValue());
                 })
                 .toList();
