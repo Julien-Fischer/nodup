@@ -5,7 +5,6 @@ import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.processors.collision.CollisionDetector;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -31,18 +30,14 @@ public class BruteForceProcessor implements ImageProcessor {
             MessageDigest md = MessageDigest.getInstance("MD5");
             int[] pixels = image.pixels();
 
-            var buffer = ByteBuffer.allocate(4 * pixels.length);
             for (int pixel : pixels) {
-                buffer.putInt(pixel);
+                md.update((byte) (pixel >>> 24));
+                md.update((byte) (pixel >>> 16));
+                md.update((byte) (pixel >>> 8));
+                md.update((byte) pixel);
             }
-            byte[] imageData = buffer.array();
 
-            md.update(imageData);
-            byte[] hashBytes = md.digest();
-
-            return toHexadecimal(hashBytes)
-                    .toString();
-
+            return toHexadecimal(md.digest()).toString();
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new RuntimeException(e);
         }
