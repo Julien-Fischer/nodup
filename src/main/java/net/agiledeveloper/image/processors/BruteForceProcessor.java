@@ -10,6 +10,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class BruteForceProcessor implements ImageProcessor {
@@ -39,30 +40,33 @@ public class BruteForceProcessor implements ImageProcessor {
             md.update(imageData);
             byte[] hashBytes = md.digest();
 
-            var hex = new StringBuilder();
-            for (byte b : hashBytes) {
-                hex.append(String.format("%02x", b));
-            }
-            return hex.toString();
-//            return new String(hashBytes);
+            return toHexadecimal(hashBytes)
+                    .toString();
 
         } catch (NoSuchAlgorithmException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private static StringBuilder toHexadecimal(byte[] hashBytes) {
+        var hex = new StringBuilder();
+        for (byte b : hashBytes) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex;
+    }
 
 
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {
-        int i = 0;
+        var filesProcessed = new AtomicInteger(0);
         int size = images.size();
         var map = new HashMap<String, Collision>();
 
         for (var image : images) {
             var hash = hash(image);
             logger.finest(() -> "-".repeat(40));
-            logger.finest(printProgress(i, size));
+            logger.finest(() -> printProgress(filesProcessed.incrementAndGet(), size));
             logger.finest(() -> "-".repeat(40));
             logger.finest(() -> "    " + hash + " | " + image);
             if (map.containsKey(hash)) {
@@ -70,7 +74,6 @@ public class BruteForceProcessor implements ImageProcessor {
             } else {
                 map.put(hash, new Collision(image));
             }
-            i++;
         }
 
         return map.values().stream()
