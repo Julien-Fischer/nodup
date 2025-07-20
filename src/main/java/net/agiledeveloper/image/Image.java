@@ -40,8 +40,8 @@ public interface Image {
             }
 
             return toHexadecimal(md.digest()).toString();
-        } catch (NoSuchAlgorithmException | IOException e) {
-            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException | IOException cause) {
+            throw new ReadException(cause);
         }
     }
 
