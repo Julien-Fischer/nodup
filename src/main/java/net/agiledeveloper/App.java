@@ -56,21 +56,28 @@ public class App {
 
     public static class MessageFormatter extends Formatter {
 
-            private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd HH:mm:ss");
+        private static final DateTimeFormatter DATE_TIME_FORMATTER = ofPattern("yyyy-MM-dd HH:mm:ss");
 
-            @Override
-            public String format(LogRecord logRecord) {
-                var date = LocalDateTime.ofInstant(
-                        Instant.ofEpochMilli(logRecord.getMillis()),
-                        ZoneId.systemDefault()
-                );
-                return String.format("[%s] %-7s %s - %s%n",
-                        date.format(DATE_TIME_FORMATTER),
-                        logRecord.getLevel().getName(),
-                        logRecord.getLoggerName(),
-                        formatMessage(logRecord)
-                );
-            }
+        @Override
+        public String format(LogRecord logRecord) {
+            return String.format(
+                    "[%s] %-7s - %s%n",
+                    formatTimestamp(logRecord),
+                    logRecord.getLevel().getName(),
+                    formatMessage(logRecord)
+            );
+        }
+
+        private String formatTimestamp(LogRecord logRecord) {
+            return getLocalDateTime(logRecord).format(DATE_TIME_FORMATTER);
+        }
+
+        private static LocalDateTime getLocalDateTime(LogRecord logRecord) {
+            return LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(logRecord.getMillis()),
+                    ZoneId.systemDefault()
+            );
+        }
 
     }
 
