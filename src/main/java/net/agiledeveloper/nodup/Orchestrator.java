@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -153,10 +152,7 @@ Flags:
     }
 
     private void parseArguments(String[] arguments) {
-        Optional<IllegalArgumentException> unknownArgument = argumentValidator.findUnknownArguments(arguments);
-        if (unknownArgument.isPresent()) {
-            throw unknownArgument.get();
-        }
+        argumentValidator.validate(arguments);
 
         processLogLevel(arguments);
 
@@ -220,17 +216,17 @@ Flags:
 
         private ArgumentValidator() { }
 
-        private Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
+        private void validate(String[] arguments) {
             for (int i = 0; i < arguments.length; i++) {
                 String argument = arguments[i];
-                if (isPositionalParameter(i, argument)) {
-                    continue;
-                }
-                if (!supports(argument)) {
-                    return Optional.of(new IllegalArgumentException("Unknown argument: " + argument));
+                if (!isSupported(i, argument)) {
+                    throw new IllegalArgumentException("Unknown argument: " + argument);
                 }
             }
-            return Optional.empty();
+        }
+
+        private boolean isSupported(int i, String argument) {
+            return isPositionalParameter(i, argument) || supports(argument);
         }
 
         private boolean supports(String argument) {
