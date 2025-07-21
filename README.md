@@ -53,6 +53,7 @@ Flags:
   -m, --move       Move files in the directory.
   -s, --scan       Scan the directory and display file information.
   -h, --help       Print this help message and exit
+  -v, --version    Print the version of this software
 ```
 
 

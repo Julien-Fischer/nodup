@@ -34,6 +34,8 @@ public class Orchestrator {
     public void execute(String[] args) {
         if (isHelpRequest(args)) {
             printHelp();
+        } else if (isPrintVersion(args)) {
+            printVersion();
         } else if (isBinCommand(args)) {
             processBin(args);
         } else {
@@ -71,6 +73,16 @@ public class Orchestrator {
 
     private boolean isClearBin(String[] arguments) {
         return asList(arguments).contains("--clear");
+    }
+
+    private boolean isPrintVersion(String[] arguments) {
+        var list = asList(arguments);
+        return list.contains("--version") || list.contains("-v");
+    }
+
+    @SuppressWarnings("java:S106")
+    private void printVersion() {
+        System.out.println(App.VERSION);
     }
 
     @SuppressWarnings("java:S106")
@@ -139,6 +151,7 @@ Flags:
   -m, --move       Move files in the directory.
   -s, --scan       Scan the directory and display file information.
   -h, --help       Print this help message and exit
+  -v, --version    Print the version of this software
 """);
     }
 
@@ -212,10 +225,11 @@ Flags:
     private static class ArgumentValidator {
 
         private static final List<String> SUPPORTED = List.of(
-                "--help", "-h",
-                "--scan", "-s",
-                "--copy", "-c",
-                "--move", "-m",
+                "--version", "-v",
+                "--help",    "-h",
+                "--scan",    "-s",
+                "--copy",    "-c",
+                "--move",    "-m",
                 "--log",
                 "bin", "--open", "--list", "--clear", "--path"
         );

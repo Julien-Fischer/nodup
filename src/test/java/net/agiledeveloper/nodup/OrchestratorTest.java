@@ -85,6 +85,19 @@ class OrchestratorTest {
         }
 
         @Test
+        void print_version_number() {
+            whenStartingApp()
+                    .withParameters("--version");
+            expectStdout()
+                    .toContain("1.0.0-beta");
+
+            whenStartingApp()
+                    .withParameters("-v");
+            expectStdout()
+                    .toContain("1.0.0-beta");
+        }
+
+        @Test
         void use_current_directory_by_default() throws IOException {
             havingDirectoryNamed("directory");
 
