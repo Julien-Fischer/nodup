@@ -17,14 +17,17 @@ import static net.agiledeveloper.nodup.App.*;
 
 public class Orchestrator {
 
+    private final ArgumentValidator argumentValidator;
     private final ImageDeduplicator imageDeduplicator;
     private final DirectoryOpener directoryOpener;
+
     private Action action = App.DEFAULT_ACTION;
 
 
     public Orchestrator(ImageDeduplicator imageDeduplicator, DirectoryOpener directoryOpener) {
         this.imageDeduplicator = imageDeduplicator;
         this.directoryOpener = directoryOpener;
+        this.argumentValidator = new ArgumentValidator();
     }
 
 
@@ -150,7 +153,7 @@ Flags:
     }
 
     private void parseArguments(String[] arguments) {
-        Optional<IllegalArgumentException> unknownArgument = findUnknownArguments(arguments);
+        Optional<IllegalArgumentException> unknownArgument = argumentValidator.findUnknownArguments(arguments);
         if (unknownArgument.isPresent()) {
             throw unknownArgument.get();
         }
@@ -161,29 +164,6 @@ Flags:
             action = readAction(argument);
         }
     }
-
-    private static Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
-        String[] supported = {
-                "--help", "-h",
-                "--scan", "-s",
-                "--copy", "-c",
-                "--move", "-m",
-                "--log",
-                "bin", "--open", "--list", "--clear", "--path"
-        };
-        for (int i = 0; i < arguments.length; i++) {
-            String argument = arguments[i];
-            if (i == 0 && !argument.startsWith("-")) {
-                continue;
-            }
-            var isSupported = asList(supported).contains(argument) || argument.startsWith("--log=");
-            if (!isSupported) {
-                return Optional.of(new IllegalArgumentException("Unknown argument: " + argument));
-            }
-        }
-        return Optional.empty();
-    }
-
 
     private static void processLogLevel(String[] arguments) {
         stream(arguments)
@@ -225,6 +205,42 @@ Flags:
             case "-s", "--scan" -> Action.SCAN;
             default -> DEFAULT_ACTION;
         };
+    }
+
+    private static class ArgumentValidator {
+
+        private static final List<String> SUPPORTED = List.of(
+                "--help", "-h",
+                "--scan", "-s",
+                "--copy", "-c",
+                "--move", "-m",
+                "--log",
+                "bin", "--open", "--list", "--clear", "--path"
+        );
+
+        private ArgumentValidator() { }
+
+        private Optional<IllegalArgumentException> findUnknownArguments(String[] arguments) {
+            for (int i = 0; i < arguments.length; i++) {
+                String argument = arguments[i];
+                if (isPositionalParameter(i, argument)) {
+                    continue;
+                }
+                if (!supports(argument)) {
+                    return Optional.of(new IllegalArgumentException("Unknown argument: " + argument));
+                }
+            }
+            return Optional.empty();
+        }
+
+        private boolean supports(String argument) {
+            return SUPPORTED.contains(argument) || argument.startsWith("--log=");
+        }
+
+        private boolean isPositionalParameter(int i, String argument) {
+            return i == 0 && !argument.startsWith("-");
+        }
+
     }
 
 }
