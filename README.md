@@ -36,6 +36,14 @@ Usage:
 
 Positional parameters:
   $1               (Optional) The path to the directory to process  
+  
+Subcommands:
+  update           Update to the latest version
+  bin
+      --list       List all bin directories
+      --path       Print bin path
+      --clear      Delete all bin directories
+      --open       Open the bin directory (requires a GUI environment)
 
 Options:
   --log            Set the logging level (e.g., severe, warning, info, fine, finer, finest).
@@ -45,11 +53,6 @@ Flags:
   -m, --move       Move files in the directory.
   -s, --scan       Scan the directory and display file information.
   -h, --help       Print this help message and exit
-  bin            
-      --list       List all bin directories
-      --path       Print bin path
-      --clear      Delete all bin directories
-      --open       Open the bin directory (requires a GUI environment)
 ```
 
 
