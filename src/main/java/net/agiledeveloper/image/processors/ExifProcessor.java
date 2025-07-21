@@ -3,7 +3,6 @@ package net.agiledeveloper.image.processors;
 import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
 import net.agiledeveloper.image.Image.Dimension;
-import net.agiledeveloper.image.processors.collision.CollisionDetector;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -16,12 +15,7 @@ import java.util.stream.Stream;
 
 import static java.lang.String.format;
 
-public class ExifProcessor extends BruteForceProcessor {
-
-    public ExifProcessor(CollisionDetector collisionDetector) {
-        super(collisionDetector);
-    }
-
+public class ExifProcessor extends BucketProcessor {
 
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {

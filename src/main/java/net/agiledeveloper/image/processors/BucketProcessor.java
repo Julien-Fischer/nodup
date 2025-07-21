@@ -2,22 +2,18 @@ package net.agiledeveloper.image.processors;
 
 import net.agiledeveloper.App;
 import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.processors.collision.CollisionDetector;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
-public class BruteForceProcessor implements ImageProcessor {
+public class BucketProcessor implements ImageProcessor {
 
     protected final Logger logger = Logger.getLogger(getClass().getSimpleName());
 
-    private final CollisionDetector collisionDetector;
 
-
-    public BruteForceProcessor(CollisionDetector collisionDetector) {
-        this.collisionDetector = collisionDetector;
+    public BucketProcessor() {
         logger.setLevel(App.LOG_LEVEL);
     }
 

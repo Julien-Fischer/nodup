@@ -1,7 +1,5 @@
 package net.agiledeveloper.image.processors;
 
-import net.agiledeveloper.image.processors.collision.CollisionDetector;
-import net.agiledeveloper.image.processors.collision.HashCollisionDetector;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
@@ -10,12 +8,10 @@ import static net.agiledeveloper.stubs.StubImage.ImageBuilder.aBigDogImage;
 import static net.agiledeveloper.stubs.StubImage.ImageBuilder.aDogImage;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-public class ExifProcessorTest extends ImageProcessorTest {
-
-    private static final CollisionDetector collisionDetector = new HashCollisionDetector();
+class ExifProcessorTest extends ImageProcessorTest {
 
     public ExifProcessorTest() {
-        super(new ExifProcessor(collisionDetector));
+        super(new ExifProcessor());
     }
 
 

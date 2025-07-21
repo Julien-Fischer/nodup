@@ -145,8 +145,6 @@ Flags:
 
     private void logConfig(Path directory) {
         logger.info(() -> "%s duplicates in %s".formatted(action, directory));
-        logger.info(() -> "Image processor: %s".formatted(PROCESSOR));
-        logger.info(() -> "Collision algorithm: %s".formatted(COLLIDER));
         logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
     }
 
@@ -219,11 +217,11 @@ Flags:
         }
     }
 
-    private static App.Action readAction(String argument) {
+    private static Action readAction(String argument) {
         return switch (argument) {
-            case "-c", "--copy" -> App.Action.COPY;
-            case "-m", "--move" -> App.Action.MOVE;
-            case "-s", "--scan" -> App.Action.SCAN;
+            case "-c", "--copy" -> Action.COPY;
+            case "-m", "--move" -> Action.MOVE;
+            case "-s", "--scan" -> Action.SCAN;
             default -> DEFAULT_ACTION;
         };
     }

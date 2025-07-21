@@ -5,9 +5,8 @@ import net.agiledeveloper.image.ImageDeduplicator;
 import net.agiledeveloper.image.ImageProvider;
 import net.agiledeveloper.image.bin.Bin;
 import net.agiledeveloper.image.bin.Bin.PathProvider;
-import net.agiledeveloper.image.processors.BruteForceProcessor;
+import net.agiledeveloper.image.processors.BucketProcessor;
 import net.agiledeveloper.image.processors.ExifProcessor;
-import net.agiledeveloper.image.processors.collision.PixelCollisionDetector;
 import net.agiledeveloper.stubs.StubImage.ImageBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,7 +51,7 @@ class OrchestratorTest {
             Bin.class,
             Orchestrator.class,
             ImageDeduplicator.class,
-            BruteForceProcessor.class
+            BucketProcessor.class
     );
 
 
@@ -564,7 +563,7 @@ class OrchestratorTest {
     private void buildOrchestrator() {
         pathProvider = new StubPathProvider(tempDir);
         bin = new Bin(pathProvider);
-        var imageProcessor = new ExifProcessor(new PixelCollisionDetector());
+        var imageProcessor = new ExifProcessor();
         var imageDeduplicator = new ImageDeduplicator(imageProcessor, imageProvider, bin);
         orchestrator = new Orchestrator(imageDeduplicator, directoryOpener);
     }
