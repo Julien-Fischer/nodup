@@ -28,19 +28,27 @@ public interface Image {
     }
 
     default String hash() {
+        var messageDigest = getMessageDigest();
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
             int[] pixels = pixels();
 
             for (int pixel : pixels) {
-                md.update((byte) (pixel >>> 24));
-                md.update((byte) (pixel >>> 16));
-                md.update((byte) (pixel >>> 8));
-                md.update((byte) pixel);
+                messageDigest.update((byte) (pixel >>> 24));
+                messageDigest.update((byte) (pixel >>> 16));
+                messageDigest.update((byte) (pixel >>> 8));
+                messageDigest.update((byte) pixel);
             }
 
-            return toHexadecimal(md.digest()).toString();
-        } catch (NoSuchAlgorithmException | IOException cause) {
+            return toHexadecimal(messageDigest.digest()).toString();
+        } catch (IOException cause) {
+            throw new ReadException(cause);
+        }
+    }
+
+    private static MessageDigest getMessageDigest() {
+        try {
+            return MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException cause) {
             throw new ReadException(cause);
         }
     }
