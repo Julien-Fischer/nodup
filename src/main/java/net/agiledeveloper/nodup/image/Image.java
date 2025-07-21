@@ -29,17 +29,21 @@ public interface Image {
 
     default String hash() {
         var messageDigest = getMessageDigest();
+        var pixels = getPixels();
+
+        for (int pixel : pixels) {
+            messageDigest.update((byte) (pixel >>> 24));
+            messageDigest.update((byte) (pixel >>> 16));
+            messageDigest.update((byte) (pixel >>> 8));
+            messageDigest.update((byte) pixel);
+        }
+
+        return toHexadecimal(messageDigest.digest()).toString();
+    }
+
+    private int[] getPixels() {
         try {
-            int[] pixels = pixels();
-
-            for (int pixel : pixels) {
-                messageDigest.update((byte) (pixel >>> 24));
-                messageDigest.update((byte) (pixel >>> 16));
-                messageDigest.update((byte) (pixel >>> 8));
-                messageDigest.update((byte) pixel);
-            }
-
-            return toHexadecimal(messageDigest.digest()).toString();
+            return pixels();
         } catch (IOException cause) {
             throw new ReadException(cause);
         }
