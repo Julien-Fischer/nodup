@@ -1,7 +1,7 @@
-package net.agiledeveloper.image.bin;
+package net.agiledeveloper.nodup.bin;
 
-import net.agiledeveloper.App;
-import net.agiledeveloper.image.bin.Bin.PathProvider;
+import net.agiledeveloper.nodup.App;
+import net.agiledeveloper.nodup.bin.Bin.PathProvider;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

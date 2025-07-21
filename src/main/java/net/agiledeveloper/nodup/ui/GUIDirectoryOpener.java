@@ -1,4 +1,4 @@
-package net.agiledeveloper;
+package net.agiledeveloper.nodup.ui;
 
 import java.awt.*;
 import java.io.IOException;

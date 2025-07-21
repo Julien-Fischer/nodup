@@ -1,6 +1,6 @@
 package net.agiledeveloper.stubs;
 
-import net.agiledeveloper.image.Image;
+import net.agiledeveloper.nodup.image.Image;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

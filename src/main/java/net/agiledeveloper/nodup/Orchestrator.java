@@ -1,6 +1,7 @@
-package net.agiledeveloper;
+package net.agiledeveloper.nodup;
 
-import net.agiledeveloper.image.ImageDeduplicator;
+import net.agiledeveloper.nodup.image.ImageDeduplicator;
+import net.agiledeveloper.nodup.ui.DirectoryOpener;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,7 +13,7 @@ import java.util.logging.Logger;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
-import static net.agiledeveloper.App.*;
+import static net.agiledeveloper.nodup.App.*;
 
 public class Orchestrator {
 

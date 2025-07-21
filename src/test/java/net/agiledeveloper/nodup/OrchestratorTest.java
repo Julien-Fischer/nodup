@@ -1,12 +1,13 @@
-package net.agiledeveloper;
+package net.agiledeveloper.nodup;
 
-import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.ImageDeduplicator;
-import net.agiledeveloper.image.ImageProvider;
-import net.agiledeveloper.image.bin.Bin;
-import net.agiledeveloper.image.bin.Bin.PathProvider;
-import net.agiledeveloper.image.processors.BucketProcessor;
-import net.agiledeveloper.image.processors.ExifProcessor;
+import net.agiledeveloper.nodup.bin.Bin;
+import net.agiledeveloper.nodup.bin.Bin.PathProvider;
+import net.agiledeveloper.nodup.image.Image;
+import net.agiledeveloper.nodup.image.ImageDeduplicator;
+import net.agiledeveloper.nodup.image.ImageProvider;
+import net.agiledeveloper.nodup.image.processors.BucketProcessor;
+import net.agiledeveloper.nodup.image.processors.ExifProcessor;
+import net.agiledeveloper.nodup.ui.DirectoryOpener;
 import net.agiledeveloper.stubs.StubImage.ImageBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

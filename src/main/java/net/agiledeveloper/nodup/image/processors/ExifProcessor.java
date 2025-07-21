@@ -1,8 +1,8 @@
-package net.agiledeveloper.image.processors;
+package net.agiledeveloper.nodup.image.processors;
 
-import net.agiledeveloper.App;
-import net.agiledeveloper.image.Image;
-import net.agiledeveloper.image.Image.Dimension;
+import net.agiledeveloper.nodup.App;
+import net.agiledeveloper.nodup.image.Image;
+import net.agiledeveloper.nodup.image.Image.Dimension;
 
 import java.util.*;
 import java.util.Map.Entry;

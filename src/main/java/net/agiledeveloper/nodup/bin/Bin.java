@@ -1,6 +1,6 @@
-package net.agiledeveloper.image.bin;
+package net.agiledeveloper.nodup.bin;
 
-import net.agiledeveloper.App.Action;
+import net.agiledeveloper.nodup.App.Action;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,8 +12,8 @@ import java.util.List;
 
 import static java.util.Arrays.stream;
 import static java.util.Collections.emptyList;
-import static net.agiledeveloper.App.Action.SCAN;
-import static net.agiledeveloper.App.logger;
+import static net.agiledeveloper.nodup.App.Action.SCAN;
+import static net.agiledeveloper.nodup.App.logger;
 
 public class Bin {
 

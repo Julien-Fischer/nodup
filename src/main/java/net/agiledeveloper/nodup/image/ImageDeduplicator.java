@@ -1,17 +1,17 @@
-package net.agiledeveloper.image;
+package net.agiledeveloper.nodup.image;
 
-import net.agiledeveloper.App.Action;
-import net.agiledeveloper.image.bin.Bin;
-import net.agiledeveloper.image.bin.Bin.BinException;
-import net.agiledeveloper.image.processors.ImageProcessor;
-import net.agiledeveloper.image.processors.ImageProcessor.Collision;
+import net.agiledeveloper.nodup.App.Action;
+import net.agiledeveloper.nodup.bin.Bin;
+import net.agiledeveloper.nodup.bin.Bin.BinException;
+import net.agiledeveloper.nodup.image.processors.ImageProcessor;
+import net.agiledeveloper.nodup.image.processors.ImageProcessor.Collision;
 
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
 
-import static net.agiledeveloper.App.Action.SCAN;
-import static net.agiledeveloper.App.logger;
+import static net.agiledeveloper.nodup.App.Action.SCAN;
+import static net.agiledeveloper.nodup.App.logger;
 
 public class ImageDeduplicator {
 

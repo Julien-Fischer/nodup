@@ -1,4 +1,4 @@
-package net.agiledeveloper.image;
+package net.agiledeveloper.nodup.image;
 
 import java.io.IOException;
 import java.nio.file.Files;

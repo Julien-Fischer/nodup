@@ -1,4 +1,4 @@
-package net.agiledeveloper.image;
+package net.agiledeveloper.nodup.image;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;

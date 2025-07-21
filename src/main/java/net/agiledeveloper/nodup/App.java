@@ -1,10 +1,11 @@
-package net.agiledeveloper;
+package net.agiledeveloper.nodup;
 
-import net.agiledeveloper.image.ImageDeduplicator;
-import net.agiledeveloper.image.SimpleImageProvider;
-import net.agiledeveloper.image.bin.Bin;
-import net.agiledeveloper.image.bin.DatePathProvider;
-import net.agiledeveloper.image.processors.ExifProcessor;
+import net.agiledeveloper.nodup.bin.Bin;
+import net.agiledeveloper.nodup.bin.DatePathProvider;
+import net.agiledeveloper.nodup.image.ImageDeduplicator;
+import net.agiledeveloper.nodup.image.SimpleImageProvider;
+import net.agiledeveloper.nodup.image.processors.ExifProcessor;
+import net.agiledeveloper.nodup.ui.GUIDirectoryOpener;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

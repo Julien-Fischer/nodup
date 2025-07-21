@@ -1,4 +1,4 @@
-package net.agiledeveloper.image.processors;
+package net.agiledeveloper.nodup.image.processors;
 
 import org.junit.jupiter.api.Test;
 

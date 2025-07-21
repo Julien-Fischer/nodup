@@ -47,7 +47,7 @@
           <archive>
             <manifest>
               <addClasspath>true</addClasspath>
-              <mainClass>net.agiledeveloper.App</mainClass>
+              <mainClass>net.agiledeveloper.nodup.App</mainClass>
             </manifest>
           </archive>
         </configuration>

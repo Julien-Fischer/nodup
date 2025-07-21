@@ -1,7 +1,7 @@
-package net.agiledeveloper.image.processors;
+package net.agiledeveloper.nodup.image.processors;
 
-import net.agiledeveloper.App;
-import net.agiledeveloper.image.Image;
+import net.agiledeveloper.nodup.App;
+import net.agiledeveloper.nodup.image.Image;
 
 import java.util.Collection;
 import java.util.HashMap;
