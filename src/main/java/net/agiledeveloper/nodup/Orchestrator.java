@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,8 +85,6 @@ public class Orchestrator {
     }
 
     private void processCommand(String[] args) {
-        setLogLevel(LOG_LEVEL);
-
         Path directory = requireValid(readDirectory(args));
         logConfig(directory);
 
@@ -148,7 +147,7 @@ Flags:
 
     private void logConfig(Path directory) {
         logger.info(() -> "%s duplicates in %s".formatted(action, directory));
-        logger.info(() -> "Log level: %s".formatted(LOG_LEVEL));
+        logger.info(() -> "Log level: %s".formatted(logger.getLevel()));
     }
 
     private void parseArguments(String[] arguments) {
@@ -162,15 +161,19 @@ Flags:
     }
 
     private static void processLogLevel(String[] arguments) {
-        stream(arguments)
+        Optional<Level> specifiedLevel = parseLogLevel(arguments);
+        Level levelToApply = specifiedLevel.orElse(DEFAULT_LOG_LEVEL);
+        setLogLevel(levelToApply);
+    }
+
+    private static Optional<Level> parseLogLevel(String[] arguments) {
+        return stream(arguments)
                 .filter(argument -> argument.startsWith("--log="))
                 .findFirst()
-                .map(Orchestrator::parseLogLevel)
-                .ifPresent(Orchestrator::setLogLevel);
+                .map(Orchestrator::parseLogLevel);
     }
 
     public static void setLogLevel(Level level) {
-        LOG_LEVEL = level;
         logger.setLevel(level);
         for (var handler : Logger.getLogger("").getHandlers()) {
             handler.setFormatter(new MessageFormatter());

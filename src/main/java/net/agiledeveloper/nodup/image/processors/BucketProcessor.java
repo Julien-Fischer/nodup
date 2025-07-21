@@ -1,22 +1,14 @@
 package net.agiledeveloper.nodup.image.processors;
 
-import net.agiledeveloper.nodup.App;
 import net.agiledeveloper.nodup.image.Image;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
+
+import static net.agiledeveloper.nodup.App.logger;
 
 public class BucketProcessor implements ImageProcessor {
-
-    protected final Logger logger = Logger.getLogger(getClass().getSimpleName());
-
-
-    public BucketProcessor() {
-        logger.setLevel(App.LOG_LEVEL);
-    }
-
 
     @Override
     public Collection<Collision> detectCollisions(Collection<Image> images) {

@@ -25,7 +25,6 @@ public class App {
     public static final String ROOT_DIR = "nodup";
 
     public static final Logger logger = Logger.getLogger(App.class.getSimpleName());
-    public static Level LOG_LEVEL = DEFAULT_LOG_LEVEL;
 
 
     public static void main(String[] args) {

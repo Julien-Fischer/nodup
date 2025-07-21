@@ -11,6 +11,7 @@ import net.agiledeveloper.nodup.ui.DirectoryOpener;
 import net.agiledeveloper.stubs.StubImage.ImageBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -71,264 +72,279 @@ class OrchestratorTest {
     }
 
 
-    @Test
-    void use_current_directory_by_default() throws IOException {
-        havingDirectoryNamed("directory");
+    @Nested
+    class ParametersTest {
 
-        whenStartingApp()
-                .withoutAnyParameter();
+        @Test
+        void print_an_help_message() {
+            whenStartingApp()
+                    .withParameters("--help");
 
-        expectLog()
-                .toContain(System.getProperty("user.dir"));
+            expectStdout()
+                    .toContainHelpMessage();
+        }
+
+        @Test
+        void use_current_directory_by_default() throws IOException {
+            havingDirectoryNamed("directory");
+
+            whenStartingApp()
+                    .withoutAnyParameter();
+
+            expectLog()
+                    .toContain(System.getProperty("user.dir"));
+        }
+
+        @Test
+        void use_default_log_level() throws IOException {
+            havingDirectoryNamed("directory");
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString());
+
+            expectLog()
+                    .toContain("Log level: INFO");
+        }
+
+        @Test
+        void use_specified_log_level() throws IOException {
+            havingDirectoryNamed("directory");
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--log=fine");
+
+            expectLog()
+                    .toContain("Log level: FINE");
+        }
+
+        @Test
+        void use_specified_log_level_when_no_positional_parameters() throws IOException {
+            havingDirectoryNamed("directory");
+
+            whenStartingApp()
+                    .withParameters("--log=fine");
+
+            expectLog()
+                    .toContain(System.getProperty("user.dir"))
+                    .toContain("Log level: FINE");
+        }
+
+        @Test
+        void unknown_arguments_throw() {
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> whenStartingApp().withParameters("--unknown-argument"))
+                    .withMessageContaining("Unknown argument: --unknown-argument");
+        }
+
+        @Test
+        void unknown_directories_can_not_be_processed() throws IOException {
+            havingDirectoryNamed("directory")
+                    .empty();
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> whenStartingApp().withParameters("/invalid/directory"))
+                    .withMessageContaining("Could not find specified directory: /invalid/directory");
+        }
+
+        @Test
+        void invalid_directory_paths_can_not_be_processed() throws IOException {
+            var textFile = aTextFile("a/text/file.txt");
+            havingDirectoryNamed("directory")
+                    .containing(textFile);
+            String filePath = textFile.fullyQualifiedPath().toString();
+
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> whenStartingApp().withParameters(filePath))
+                    .withMessageContaining("Specified path is not a directory: " + filePath);
+        }
+
     }
 
-    @Test
-    void with_no_images() throws IOException {
-        havingDirectoryNamed("directory")
-                .empty();
+    @Nested
+    class CollisionDetectionTest {
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString());
+        @Test
+        void with_no_images() throws IOException {
+            havingDirectoryNamed("directory")
+                    .empty();
 
-        assertThatNoFilesWereFound();
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString());
+
+            assertThatNoFilesWereFound();
+        }
+
+        @Test
+        void with_images_but_no_collision() throws IOException {
+            havingDirectoryNamed("directory")
+                    .containing(aBigDog(), aDog(), aCat());
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--log=fine");
+
+            assertThatFilesWereFound(3);
+            assertThatNoDuplicatesWereFound();
+        }
+
+        @Test
+        void with_collisions() throws IOException {
+            var a = aDogImage().named("dog-a").build();
+            var b = aDogImage().named("dog-b").build();
+            havingDirectoryNamed("directory")
+                    .containing(aBigDog(), a, b, aCat());
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--log=finer");
+
+            assertThatDuplicatesWereFound(1)
+                    .forImages(a, b);
+        }
+
+        @Test
+        void duplicates_are_moved_to_bin() throws IOException {
+            havingDirectoryToScan("directory");
+            var dogA = aDogImage().located(directoryToScan).named("dog-a").build();
+            var dogB = aDogImage().located(directoryToScan).named("dog-b").build();
+            var catA = aCatImage().located(directoryToScan).named("cat-a").build();
+            var catB = aCatImage().located(directoryToScan).named("cat-b").build();
+            givenThat(directoryToScan)
+                    .contains(aBigDog(), dogA, catA, catB, dogB);
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--move");
+
+            assertThatDuplicatesWereMoved(2)
+                    .forImages(catA, dogA);
+        }
+
+        @Test
+        void duplicates_are_copied_to_bin() throws IOException {
+            havingDirectoryToScan("directory");
+            var a = aDogImage().located(directoryToScan).named("dog-a").build();
+            var b = aDogImage().located(directoryToScan).named("dog-b").build();
+            givenThat(directoryToScan)
+                    .contains(aBigDog(), a, b, aCat());
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--copy");
+
+            assertThatDuplicatesWereCopied(1)
+                    .forImages(a);
+        }
+
+        @Test
+        void multiple_collisions_are_supported() throws IOException {
+            havingDirectoryToScan("directory");
+            var a = aDogImage().located(directoryToScan).named("dog-a").build();
+            var b = aDogImage().located(directoryToScan).named("dog-b").build();
+            var c = aDogImage().located(directoryToScan).named("dog-c").build();
+            givenThat(directoryToScan)
+                    .contains(aBigDog(), a, b, c, aCat());
+
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--copy");
+
+            assertThatDuplicatesWereCopied(2)
+                    .forImages(a, b);
+        }
+
     }
 
-    @Test
-    void with_images_but_no_collision() throws IOException {
-        havingDirectoryNamed("directory")
-                .containing(aBigDog(), aDog(), aCat());
+    @Nested
+    class BinTest {
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--log=fine");
+        @Test
+        void open_bin_directory() {
+            whenStartingApp()
+                    .withParameters("bin", "--open");
 
-        assertThatFilesWereFound(3);
-        assertThatNoDuplicatesWereFound();
-    }
+            expect(directoryOpener)
+                    .toHaveOpened(bin.root());
+        }
 
-    @Test
-    void with_collisions() throws IOException {
-        var a = aDogImage().named("dog-a").build();
-        var b = aDogImage().named("dog-b").build();
-        havingDirectoryNamed("directory")
-                .containing(aBigDog(), a, b, aCat());
+        @Test
+        void only_create_bin_directory_on_duplicate_copy() throws IOException {
+            havingDirectoryToScan("directory");
+            var a = aDogImage().located(directoryToScan).named("dog-a").build();
+            var b = aDogImage().located(directoryToScan).named("dog-b").build();
+            givenThat(directoryToScan)
+                    .contains(a, b);
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--log=finer");
+            expect(bin).toBeEmpty();
 
-        assertThatDuplicatesWereFound(1)
-                .forImages(a, b);
-    }
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--copy");
 
-    @Test
-    void duplicates_are_moved_to_bin() throws IOException {
-        havingDirectoryToScan("directory");
-        var dogA = aDogImage().located(directoryToScan).named("dog-a").build();
-        var dogB = aDogImage().located(directoryToScan).named("dog-b").build();
-        var catA = aCatImage().located(directoryToScan).named("cat-a").build();
-        var catB = aCatImage().located(directoryToScan).named("cat-b").build();
-        givenThat(directoryToScan)
-                .contains(aBigDog(), dogA, catA, catB, dogB);
+            expect(bin).toContain(b);
+        }
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--move");
+        @Test
+        void only_create_bin_directory_on_duplicate_move() throws IOException {
+            havingDirectoryToScan("directory");
+            var a = aDogImage().located(directoryToScan).named("dog-a").build();
+            var b = aDogImage().located(directoryToScan).named("dog-b").build();
+            givenThat(directoryToScan)
+                    .contains(a, b);
 
-        assertThatDuplicatesWereMoved(2)
-                .forImages(catA, dogA);
-    }
+            expect(bin).toBeEmpty();
 
-    @Test
-    void duplicates_are_copied_to_bin() throws IOException {
-        havingDirectoryToScan("directory");
-        var a = aDogImage().located(directoryToScan).named("dog-a").build();
-        var b = aDogImage().located(directoryToScan).named("dog-b").build();
-        givenThat(directoryToScan)
-                .contains(aBigDog(), a, b, aCat());
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--move");
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--copy");
+            expect(bin).toContain(b);
+        }
 
-        assertThatDuplicatesWereCopied(1)
-                .forImages(a);
-    }
+        @Test
+        void create_bin_directory_on_duplicate_scan() throws IOException {
+            givenThat(aDogImage()).hasDuplicates(1);
 
-    @Test
-    void multiple_collisions_are_supported() throws IOException {
-        havingDirectoryToScan("directory");
-        var a = aDogImage().located(directoryToScan).named("dog-a").build();
-        var b = aDogImage().located(directoryToScan).named("dog-b").build();
-        var c = aDogImage().located(directoryToScan).named("dog-c").build();
-        givenThat(directoryToScan)
-                .contains(aBigDog(), a, b, c, aCat());
+            expect(bin).toBeEmpty();
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--copy");
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "--scan");
 
-        assertThatDuplicatesWereCopied(2)
-                .forImages(a, b);
-    }
+            expect(bin).toBeEmpty();
+        }
 
-    @Test
-    void use_default_log_level() throws IOException {
-        havingDirectoryNamed("directory");
+        @Test
+        void list_bin_directories() throws IOException {
+            havingBinDirectories(1);
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString());
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "bin", "--list");
 
-        expectLog()
-                .toContain("Log level: INFO");
-    }
+            expectStdout()
+                    .toPartiallyMatch("/bin/current$");
+        }
 
-    @Test
-    void use_specified_log_level() throws IOException {
-        havingDirectoryNamed("directory");
+        @Test
+        void clear_deletes_all_bin_directories() throws IOException {
+            havingBinDirectories(2);
 
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--log=fine");
+            whenStartingApp()
+                    .withParameters(directoryToScan.toString(), "bin", "--clear");
 
-        expectLog()
-                .toContain("Log level: FINE");
-    }
+            expect(bin).toBeEmpty();
+        }
 
-    @Test
-    void use_specified_log_level_when_no_positional_parameters() throws IOException {
-        havingDirectoryNamed("directory");
+        @Test
+        void bin_path_prints_bin_path() {
+            whenStartingApp()
+                    .withParameters("bin", "--path");
 
-        whenStartingApp()
-                .withParameters("--log=fine");
+            expectStdout()
+                    .toContain("/bin");
+        }
 
-        expectLog()
-                .toContain(System.getProperty("user.dir"))
-                .toContain("Log level: FINE");
-    }
+        @Test
+        void bin_prints_bin_path() {
+            whenStartingApp()
+                    .withParameters("bin");
 
-    @Test
-    void print_an_help_message() {
-        whenStartingApp()
-                .withParameters("--help");
+            expectStdout()
+                    .toContainHelpMessage();
+        }
 
-        expectStdout()
-                .toContainHelpMessage();
-    }
-
-    @Test
-    void unknown_arguments_throw() {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> whenStartingApp().withParameters("--unknown-argument"))
-                .withMessageContaining("Unknown argument: --unknown-argument");
-    }
-
-    @Test
-    void open_bin_directory() {
-        whenStartingApp()
-                .withParameters("bin", "--open");
-
-        expect(directoryOpener)
-                .toHaveOpened(bin.root());
-    }
-
-    @Test
-    void unknown_directories_can_not_be_processed() throws IOException {
-        havingDirectoryNamed("directory")
-                .empty();
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> whenStartingApp().withParameters("/invalid/directory"))
-                .withMessageContaining("Could not find specified directory: /invalid/directory");
-    }
-
-    @Test
-    void invalid_directory_paths_can_not_be_processed() throws IOException {
-        var textFile = aTextFile("a/text/file.txt");
-        havingDirectoryNamed("directory")
-                .containing(textFile);
-        String filePath = textFile.fullyQualifiedPath().toString();
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> whenStartingApp().withParameters(filePath))
-                .withMessageContaining("Specified path is not a directory: " + filePath);
-    }
-
-    @Test
-    void only_create_bin_directory_on_duplicate_copy() throws IOException {
-        havingDirectoryToScan("directory");
-        var a = aDogImage().located(directoryToScan).named("dog-a").build();
-        var b = aDogImage().located(directoryToScan).named("dog-b").build();
-        givenThat(directoryToScan)
-                .contains(a, b);
-
-        expect(bin).toBeEmpty();
-
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--copy");
-
-        expect(bin).toContain(b);
-    }
-
-    @Test
-    void only_create_bin_directory_on_duplicate_move() throws IOException {
-        havingDirectoryToScan("directory");
-        var a = aDogImage().located(directoryToScan).named("dog-a").build();
-        var b = aDogImage().located(directoryToScan).named("dog-b").build();
-        givenThat(directoryToScan)
-                .contains(a, b);
-
-        expect(bin).toBeEmpty();
-
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--move");
-
-        expect(bin).toContain(b);
-    }
-
-    @Test
-    void create_bin_directory_on_duplicate_scan() throws IOException {
-        givenThat(aDogImage()).hasDuplicates(1);
-
-        expect(bin).toBeEmpty();
-
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "--scan");
-
-        expect(bin).toBeEmpty();
-    }
-
-    @Test
-    void list_bin_directories() throws IOException {
-        havingBinDirectories(1);
-
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "bin", "--list");
-
-        expectStdout()
-                .toPartiallyMatch("/bin/current$");
-    }
-
-    @Test
-    void clear_deletes_all_bin_directories() throws IOException {
-        havingBinDirectories(2);
-
-        whenStartingApp()
-                .withParameters(directoryToScan.toString(), "bin", "--clear");
-
-        expect(bin).toBeEmpty();
-    }
-
-    @Test
-    void bin_path_prints_bin_path() {
-        whenStartingApp()
-                .withParameters("bin", "--path");
-
-        expectStdout()
-                .toContain("/bin");
-    }
-
-    @Test
-    void bin_prints_bin_path() {
-        whenStartingApp()
-                .withParameters("bin");
-
-        expectStdout()
-                .toContainHelpMessage();
     }
 
 

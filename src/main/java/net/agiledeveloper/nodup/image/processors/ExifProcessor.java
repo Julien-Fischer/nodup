@@ -1,6 +1,5 @@
 package net.agiledeveloper.nodup.image.processors;
 
-import net.agiledeveloper.nodup.App;
 import net.agiledeveloper.nodup.image.Image;
 import net.agiledeveloper.nodup.image.Image.Dimension;
 
@@ -14,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.lang.String.format;
+import static net.agiledeveloper.nodup.App.logger;
 
 public class ExifProcessor extends BucketProcessor {
 
@@ -28,7 +28,6 @@ public class ExifProcessor extends BucketProcessor {
 
 
     private List<Collision> findActualCollisions(Map<Discriminator, PotentialCollision> potentialCollisions) {
-        logger.setLevel(App.LOG_LEVEL);
         var total = countTotal(potentialCollisions);
         logSummary(total, potentialCollisions);
         logBuckets(toFrequencyMap(potentialCollisions));
