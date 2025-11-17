@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+install_maven_if_not_present() {
+  if ! command -v mvn >/dev/null 2>&1; then
+    read -r -p "Maven is required to compile nodup the first time. Do you want to install it now? (Y/n):" user_input
+    user_input=${user_input:-Y}
+    if [[ "${user_input,,}" =~ ^(y|yes)$ ]]; then
+      sudo apt update && sudo apt install -y maven
+      echo "Maven installation completed."
+    else
+      echo "Maven installation aborted by user."
+      exit 1
+    fi
+  fi
+  mvn --version
+}
+
 # shellcheck disable=SC2120
 install() {
   local jar_path="${HOME}/nodup"
@@ -18,6 +33,8 @@ install() {
     echo "This script requires sudo privileges. Exiting."
     exit 1
   fi
+
+  install_maven_if_not_present
 
 
 script_content=$(cat <<EOF
@@ -52,6 +69,7 @@ fi
 EOF
 )
 
+  is_path_provided
   if $is_path_provided; then
       cd "${1}" || exit
   fi
