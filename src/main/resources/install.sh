@@ -76,7 +76,7 @@ EOF
 
   echo "Compiling nodup..."
 
-  if mvn -s ./maven-config.xml clean install > build.log 2>&1; then
+  if mvn clean install > build.log 2>&1 &&  mvn -s ./maven-config.xml clean install > build.log 2>&1; then
       echo "> OK"
   else
     echo "Maven clean install failed"
